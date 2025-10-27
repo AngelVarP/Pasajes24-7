@@ -1,0 +1,8 @@
+/* resources/css/app.css */
+
+/* Importa las clases base de Tailwind CSS */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Aquí puedes agregar tus estilos personalizados */
