@@ -3,6 +3,7 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>Pasajes24/7 - Tu Aventura en Bus Comienza Aquí</title>
     <meta name="description" content="Diseña tu viaje perfecto. Encuentra y reserva pasajes de bus online con Pasajes24/7 de forma creativa y sencilla.">
 
@@ -20,6 +21,26 @@
             -moz-osx-font-smoothing: grayscale;
         }
         ::placeholder { color: #94a3b8; opacity: 1; } /* slate-400 */
+        
+        /* Estilos para el autocompletado */
+        .suggestion-item {
+            padding: 8px 16px;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+        .suggestion-item:hover {
+            background-color: #f3f4f6;
+        }
+        #origen-suggestions,
+        #destino-suggestions {
+            background: white;
+            border: 1px solid #e5e7eb;
+            border-radius: 0 0 8px 8px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            max-height: 200px;
+            overflow-y: auto;
+            z-index: 1000;
+        }
         /* Custom focus ring */
         input:focus, button:focus-visible {
             outline: none;

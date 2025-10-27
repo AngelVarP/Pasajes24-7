@@ -3,7 +3,7 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use App\Models\Ciudad; // ¡Importa el nuevo modelo Ciudad!
+use App\Models\Ciudad; // Asegúrate de importar el modelo Ciudad
 
 class CiudadController extends Controller
 {
@@ -15,25 +15,29 @@ class CiudadController extends Controller
      */
     public function buscar(Request $request)
     {
-        $query = $request->input('q'); // 'q' es el parámetro de búsqueda, ej: ?q=lim
+        \Log::info('Búsqueda de ciudad iniciada', ['query' => $request->input('q')]);
+        $query = $request->input('q');
 
         if (empty($query)) {
-            return response()->json([]); // Si no hay query, devuelve un array vacío
+            return response()->json([]);
+        }
+
+        if (empty($query)) {
+            return response()->json([]); // Si la consulta está vacía, devuelve un array vacío
         }
 
         $ciudades = Ciudad::where('nombre', 'like', '%' . $query . '%')
-                          ->orderBy('nombre') // Opcional: ordenar alfabéticamente
-                          ->get(['nombre']); // Solo queremos el nombre de la ciudad
+                          ->orderBy('nombre')
+                          ->get(); // Obtener el objeto completo para poder formatear
 
-        // Si quieres incluir el departamento para mayor claridad, puedes hacer esto:
-        // $ciudades = Ciudad::where('nombre', 'like', '%' . $query . '%')
-        //                   ->orderBy('nombre')
-        //                   ->get()
-        //                   ->map(function ($ciudad) {
-        //                       return $ciudad->nombre . ($ciudad->departamento ? ' (' . $ciudad->departamento . ')' : '');
-        //                   });
+        // Mapear los resultados para devolver un formato específico: "Nombre (Departamento)"
+        $formattedCiudades = $ciudades->map(function ($ciudad) {
+            return $ciudad->nombre . ($ciudad->departamento ? ' (' . $ciudad->departamento . ')' : '');
+        });
 
+        // Para depuración:
+        // return response()->json(['query' => $query, 'raw_ciudades' => $ciudades, 'formatted_ciudades' => $formattedCiudades]);
 
-        return response()->json($ciudades->pluck('nombre')); // Devuelve solo los nombres como un array plano
+        return response()->json($formattedCiudades); // Devolver un array de strings formateados
     }
 }

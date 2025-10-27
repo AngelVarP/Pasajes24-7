@@ -1,212 +1,256 @@
-// resources/js/app.js
+import './bootstrap'; // Asegúrate de que esto esté al principio
+import Alpine from 'alpinejs';
 
-// Importa bootstrap.js que configura Axios globalmente
-// This assumes bootstrap.js is correctly setting up window.axios
-import './bootstrap';
-// Importa los estilos CSS (Tailwind)
-import '../css/app.css';
+window.Alpine = Alpine;
+Alpine.start();
 
-console.log("Pasajes24/7 Frontend Ready! 👍");
-
-// --- DOM Element Selections ---
-const searchForm = document.getElementById('search-form');
-const origenInput = document.getElementById('origen');
-const destinoInput = document.getElementById('destino');
-const fechaInput = document.getElementById('fecha');
-const searchError = document.getElementById('search-error');
-const origenSuggestions = document.getElementById('origen-suggestions');
-const destinoSuggestions = document.getElementById('destino-suggestions');
-
-// --- Simple Frontend Form Validation ---
-if (searchForm && origenInput && destinoInput && fechaInput && searchError) {
-    searchForm.addEventListener('submit', function(event) {
-        // Hide previous errors
-        searchError.classList.add('hidden');
-        searchError.textContent = '';
-        let isValid = true;
-
-        // Simple validation: origin and destination cannot be the same (case-insensitive)
-        const origenValue = origenInput.value.trim().toLowerCase();
-        const destinoValue = destinoInput.value.trim().toLowerCase();
-
-        if (origenValue === destinoValue && origenValue !== '') {
-            searchError.textContent = 'El origen y el destino no pueden ser iguales.';
-            searchError.classList.remove('hidden');
-            origenInput.classList.add('border-red-500'); // Add error styling
-            destinoInput.classList.add('border-red-500');
-            isValid = false;
-        } else {
-             origenInput.classList.remove('border-red-500'); // Remove error styling
-             destinoInput.classList.remove('border-red-500');
-        }
-
-        // Simple validation: date should not be empty (though 'required' helps)
-        if (!fechaInput.value) {
-            // Could add a specific message if needed
-            fechaInput.classList.add('border-red-500');
-            isValid = false;
-        } else {
-            fechaInput.classList.remove('border-red-500');
-        }
-
-        // Prevent form submission if invalid
-        if (!isValid) {
-            event.preventDefault();
-            console.error("Search form validation errors.");
-        } else {
-            // Optional: Show a loading indicator
-            console.log("Form is valid, submitting...");
-            // You might want to disable the submit button here to prevent double submission
-            // searchForm.querySelector('button[type="submit"]').disabled = true;
-            // searchForm.querySelector('button[type="submit"]').textContent = 'Buscando...';
-        }
-    });
-} else {
-    console.warn("Could not find all required elements for search form validation.");
+// Configurar el token CSRF para las peticiones AJAX
+const token = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
+if (token) {
+    window.axios.defaults.headers.common['X-CSRF-TOKEN'] = token;
 }
 
-// --- Autocomplete Logic ---
 
-/**
- * Debounce function to limit API calls while typing.
- * @param {Function} func - The function to debounce.
- * @param {number} delay - The debounce delay in milliseconds.
- * @returns {Function} - The debounced function.
- */
-function debounce(func, delay) {
-    let timeoutId;
-    return function(...args) {
-        clearTimeout(timeoutId);
-        timeoutId = setTimeout(() => {
-            func.apply(this, args);
-        }, delay);
-    };
-}
+// --- Lógica para el Autocompletado y Validación de Ciudades ---
 
-/**
- * Fetches city suggestions from the API.
- * @param {string} query - The search term.
- * @param {HTMLElement} suggestionBox - The DOM element to display suggestions in.
- */
-async function fetchSuggestions(query, suggestionBox) {
-    const targetInput = suggestionBox.id.includes('origen') ? origenInput : destinoInput;
+// Declaración de funciones
+const setupAutocomplete = (inputId, suggestionsId) => {
+    const input = document.getElementById(inputId);
+    const suggestionsContainer = document.getElementById(suggestionsId);
+    let timeout = null;
 
-    if (query.length < 2) { // Don't search for less than 2 characters
-        suggestionBox.innerHTML = '';
-        suggestionBox.classList.add('hidden');
+    if (!input || !suggestionsContainer) {
+        console.warn(`Elementos para autocompletado no encontrados: inputId=${inputId}, suggestionsId=${suggestionsId}`);
         return;
     }
 
-    try {
-        // !!! Ensure this URL matches your API endpoint !!!
-        const response = await axios.get(`/api/ciudades/buscar?q=${encodeURIComponent(query)}`);
-        const ciudades = response.data; // Expects an array of strings
+    input.addEventListener('input', function() {
+        clearTimeout(timeout);
 
-        suggestionBox.innerHTML = ''; // Clear previous suggestions
+        const query = input.value.trim();
 
-        if (ciudades && Array.isArray(ciudades) && ciudades.length > 0) {
+        if (query.length < 2) {
+            suggestionsContainer.innerHTML = '';
+            suggestionsContainer.classList.add('hidden');
+            return;
+        }
+
+        timeout = setTimeout(async () => {
+            try {
+                console.log('Fetching cities for query:', query);
+                const baseUrl = window.location.origin; // Obtener la URL base dinámica
+                const response = await fetch(`${baseUrl}/api/ciudades/buscar?q=${encodeURIComponent(query)}`);
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                const ciudades = await response.json();
+                console.log('Response:', ciudades);
+                console.log('Cities received:', ciudades);
+                displaySuggestions(ciudades, input, suggestionsContainer);
+            } catch (error) {
+                console.error('Error fetching cities:', error);
+                suggestionsContainer.innerHTML = `<div class="p-2 text-red-500">Error al cargar ciudades.</div>`;
+                suggestionsContainer.classList.remove('hidden');
+            }
+        }, 300);
+    });
+
+    suggestionsContainer.addEventListener('click', function(event) {
+        if (event.target.tagName === 'DIV' && event.target.classList.contains('suggestion-item')) {
+            input.value = event.target.textContent;
+            suggestionsContainer.innerHTML = '';
+            suggestionsContainer.classList.add('hidden');
+            hideSearchError();
+        }
+    });
+
+    document.addEventListener('click', function(event) {
+        if (event.target !== input && !suggestionsContainer.contains(event.target)) {
+            suggestionsContainer.innerHTML = '';
+            suggestionsContainer.classList.add('hidden');
+        }
+    });
+
+    input.addEventListener('blur', function() {
+        setTimeout(() => {
+            if (!suggestionsContainer.contains(document.activeElement)) {
+                suggestionsContainer.innerHTML = '';
+                suggestionsContainer.classList.add('hidden');
+            }
+        }, 100);
+    });
+};
+
+const displaySuggestions = (ciudades, inputElement, containerElement) => {
+    containerElement.innerHTML = '';
+    
+    if (ciudades.length > 0) {
+        ciudades.forEach(ciudad => {
+            const div = document.createElement('div');
+            div.classList.add('p-2', 'cursor-pointer', 'hover:bg-gray-100', 'suggestion-item');
+            div.textContent = ciudad;
+            containerElement.appendChild(div);
+        });
+        containerElement.classList.remove('hidden');
+    } else {
+        containerElement.classList.add('hidden');
+    }
+};
+
+document.addEventListener('DOMContentLoaded', function() {
+    console.log('DOM Content Loaded - Initializing autocomplete...');
+    
+    const searchForm = document.getElementById('search-form');
+    const origenInput = document.getElementById('origen');
+    const destinoInput = document.getElementById('destino');
+    const searchErrorDiv = document.getElementById('search-error');
+
+    // Función para configurar el autocompletado en un campo específico
+    const setupAutocomplete = (inputId, suggestionsId) => {
+        const input = document.getElementById(inputId);
+        const suggestionsContainer = document.getElementById(suggestionsId);
+        let timeout = null; // Para retrasar las peticiones a la API
+
+        if (!input || !suggestionsContainer) {
+            // console.warn(`Elementos para autocompletado no encontrados: inputId=${inputId}, suggestionsId=${suggestionsId}`);
+            return; // Salir si los elementos no existen
+        }
+
+        input.addEventListener('input', function() {
+            clearTimeout(timeout); // Limpiar cualquier timeout anterior
+
+            const query = input.value.trim();
+
+            if (query.length < 2) { // Solo buscar si hay al menos 2 caracteres
+                suggestionsContainer.innerHTML = '';
+                suggestionsContainer.classList.add('hidden');
+                return;
+            }
+
+            // Retrasar la petición a la API para evitar spam y mejorar rendimiento
+            timeout = setTimeout(async () => {
+                try {
+                    console.log('Fetching cities for query:', query);
+                    const response = await fetch(`/api/ciudades/buscar?q=${encodeURIComponent(query)}`);
+                    if (!response.ok) {
+                        throw new Error(`HTTP error! status: ${response.status}`);
+                    }
+                    const ciudades = await response.json();
+                    console.log('Cities received:', ciudades);
+                    
+                    displaySuggestions(ciudades, input, suggestionsContainer);
+
+                } catch (error) {
+                    console.error('Error fetching cities:', error);
+                    suggestionsContainer.innerHTML = `<div class="p-2 text-red-500">Error al cargar ciudades.</div>`;
+                    suggestionsContainer.classList.remove('hidden');
+                }
+            }, 300); // Esperar 300ms después de la última tecla
+
+        });
+
+        // Manejar clics en las sugerencias
+        suggestionsContainer.addEventListener('click', function(event) {
+            if (event.target.tagName === 'DIV' && event.target.classList.contains('suggestion-item')) {
+                input.value = event.target.textContent;
+                suggestionsContainer.innerHTML = '';
+                suggestionsContainer.classList.add('hidden');
+            }
+            // Después de seleccionar, limpiar posibles errores de validación anteriores
+            hideSearchError();
+        });
+
+        // Ocultar sugerencias cuando se hace clic fuera del input/sugerencias
+        document.addEventListener('click', function(event) {
+            if (event.target !== input && !suggestionsContainer.contains(event.target)) {
+                suggestionsContainer.innerHTML = '';
+                suggestionsContainer.classList.add('hidden');
+            }
+        });
+
+        // Ocultar sugerencias si el input pierde el foco y no se hizo clic en una sugerencia
+        input.addEventListener('blur', function() {
+             // Pequeño retraso para permitir que el evento click en la sugerencia se dispare
+            setTimeout(() => {
+                if (!suggestionsContainer.contains(document.activeElement)) { // Si el foco no está en el contenedor de sugerencias
+                    suggestionsContainer.innerHTML = '';
+                    suggestionsContainer.classList.add('hidden');
+                }
+            }, 100);
+        });
+    };
+
+    // Función para mostrar las sugerencias en el contenedor
+    const displaySuggestions = (ciudades, inputElement, containerElement) => {
+        containerElement.innerHTML = ''; // Limpiar sugerencias anteriores
+
+        if (ciudades.length > 0) {
             ciudades.forEach(ciudad => {
                 const div = document.createElement('div');
+                div.classList.add('p-2', 'cursor-pointer', 'hover:bg-gray-100', 'suggestion-item');
                 div.textContent = ciudad;
-                // Tailwind classes for styling suggestions
-                div.classList.add('p-2', 'hover:bg-gray-100', 'cursor-pointer', 'text-sm', 'text-gray-700', 'text-left');
-                div.addEventListener('click', () => {
-                    targetInput.value = ciudad; // Fill input
-                    suggestionBox.innerHTML = ''; // Clear suggestions
-                    suggestionBox.classList.add('hidden'); // Hide box
-                });
-                suggestionBox.appendChild(div);
+                containerElement.appendChild(div);
             });
-            suggestionBox.classList.remove('hidden'); // Show suggestions box
+            containerElement.classList.remove('hidden'); // Mostrar el contenedor
         } else {
-            // Optional: Show "No results found" message
-            /*
-            const noResultsDiv = document.createElement('div');
-            noResultsDiv.textContent = 'No se encontraron ciudades.';
-            noResultsDiv.classList.add('p-2', 'text-sm', 'text-gray-500', 'text-left');
-            suggestionBox.appendChild(noResultsDiv);
-            suggestionBox.classList.remove('hidden');
-            */
-            suggestionBox.classList.add('hidden'); // Or just hide it
+            containerElement.classList.add('hidden'); // Ocultar si no hay sugerencias
         }
-    } catch (error) {
-        console.error('Error fetching suggestions:', error);
-        suggestionBox.innerHTML = '';
-        suggestionBox.classList.add('hidden');
+    };
+
+    // Función para mostrar el error de búsqueda
+    const showSearchError = (message) => {
+        if (searchErrorDiv) {
+            searchErrorDiv.textContent = message;
+            searchErrorDiv.classList.remove('hidden');
+        }
+    };
+
+    // Función para ocultar el error de búsqueda
+    const hideSearchError = () => {
+        if (searchErrorDiv) {
+            searchErrorDiv.textContent = '';
+            searchErrorDiv.classList.add('hidden');
+        }
+    };
+
+
+    // --- Validación del Formulario ---
+    if (searchForm) {
+        searchForm.addEventListener('submit', function(event) {
+            // Ocultar cualquier error anterior
+            hideSearchError();
+
+            const origenValue = origenInput.value.trim();
+            const destinoValue = destinoInput.value.trim();
+
+            // Validar que Origen y Destino no sean iguales
+            if (origenValue && destinoValue && origenValue === destinoValue) {
+                event.preventDefault(); // Detener el envío del formulario
+                showSearchError('El origen y el destino no pueden ser la misma ciudad.');
+                return;
+            }
+
+            // Validar que la fecha no esté vacía (aunque el input type="date" ya lo hace)
+            const fechaInput = document.getElementById('fecha');
+            if (!fechaInput.value) {
+                event.preventDefault();
+                showSearchError('Por favor, selecciona una fecha de salida.');
+                return;
+            }
+
+            // Aquí podrías añadir más validaciones si fuera necesario (ej. que las ciudades sean válidas)
+        });
+
+        // Limpiar el error cuando los campos de origen/destino cambian
+        origenInput.addEventListener('input', hideSearchError);
+        destinoInput.addEventListener('input', hideSearchError);
+        document.getElementById('fecha').addEventListener('input', hideSearchError);
     }
-}
-
-// Debounced version of fetchSuggestions to limit API calls
-const debouncedFetchSuggestions = debounce(fetchSuggestions, 300); // 300ms delay
-
-// Add input listeners for origin and destination
-if (origenInput && origenSuggestions) {
-    origenInput.addEventListener('input', () => debouncedFetchSuggestions(origenInput.value, origenSuggestions));
-
-    // Hide suggestions when clicking outside
-    document.addEventListener('click', (e) => {
-        if (!origenInput.contains(e.target) && !origenSuggestions.contains(e.target)) {
-            origenSuggestions.classList.add('hidden');
-        }
-    });
-     // Hide suggestions on focus out unless clicking on a suggestion item
-    origenInput.addEventListener('blur', (e) => {
-        // Delay hiding slightly to allow click event on suggestion to register
-        setTimeout(() => {
-            if (!origenSuggestions.contains(document.activeElement)) {
-                 origenSuggestions.classList.add('hidden');
-            }
-        }, 150);
-    });
-} else {
-     console.warn("Origin input or suggestion box not found for autocomplete.");
-}
-
-if (destinoInput && destinoSuggestions) {
-    destinoInput.addEventListener('input', () => debouncedFetchSuggestions(destinoInput.value, destinoSuggestions));
-
-    // Hide suggestions when clicking outside
-     document.addEventListener('click', (e) => {
-        if (!destinoInput.contains(e.target) && !destinoSuggestions.contains(e.target)) {
-            destinoSuggestions.classList.add('hidden');
-        }
-    });
-    // Hide suggestions on focus out unless clicking on a suggestion item
-    destinoInput.addEventListener('blur', (e) => {
-       // Delay hiding slightly
-        setTimeout(() => {
-            if (!destinoSuggestions.contains(document.activeElement)) {
-                 destinoSuggestions.classList.add('hidden');
-            }
-        }, 150);
-    });
-} else {
-     console.warn("Destination input or suggestion box not found for autocomplete.");
-}
 
 
-// --- Optional: Datepicker Integration (Example using Flatpickr) ---
-// If you want to use this:
-// 1. Install flatpickr: npm install flatpickr
-// 2. Uncomment the following lines
-// 3. Optionally change the date input type in welcome.blade.php to "text"
+    // --- Inicialización ---
+    // Inicializar autocompletado para Origen y Destino
+    setupAutocomplete('origen', 'origen-suggestions');
+    setupAutocomplete('destino', 'destino-suggestions');
 
-/*
-import flatpickr from "flatpickr";
-import "flatpickr/dist/flatpickr.min.css";
-// Optional: Import Spanish locale for flatpickr
-// import { Spanish } from "flatpickr/dist/l10n/es.js";
-
-const fechaInputForPicker = document.getElementById('fecha');
-if (fechaInputForPicker) {
-    flatpickr(fechaInputForPicker, {
-        // locale: Spanish, // Use Spanish locale
-        altInput: true, // Shows a human-readable date, sends standard format
-        altFormat: "j F, Y", // Format shown to the user (e.g., 27 Octubre, 2025)
-        dateFormat: "Y-m-d", // Format sent to the server
-        minDate: "today", // Prevent selecting past dates
-        disableMobile: "true" // Use flatpickr UI on mobile instead of native
-        // More options available: https://flatpickr.js.org/options/
-    });
-}
-*/
+});

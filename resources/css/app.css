@@ -1,8 +1,46 @@
-/* resources/css/app.css */
-
-/* Importa las clases base de Tailwind CSS */
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
-/* Aquí puedes agregar tus estilos personalizados */
+/* * Estilos para el contenedor de sugerencias del autocompletado
+ * Estos estilos ya están aplicados en el HTML con clases de Tailwind,
+ * pero los incluyo aquí por si se necesitara alguna anulación o estilo específico no-Tailwind.
+ */
+.autocomplete-suggestions {
+    /* Las siguientes clases ya están en tu HTML: */
+    /* position: absolute; */
+    /* z-index: 20; */
+    /* width: 100%; */
+    /* background-color: #fff; */
+    /* border: 1px solid #e2e8f0; */ /* border-gray-200 */
+    /* border-top: none; */
+    /* border-radius: 0 0 0.5rem 0.5rem; */ /* rounded-b-lg */
+    /* box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05); */ /* shadow-lg */
+    /* margin-top: 0.25rem; */ /* mt-1 */
+    /* max-height: 13rem; */ /* max-h-52 */
+    /* overflow-y: auto; */
+    /* text-align: left; */
+}
+
+/* Estilos para cada ítem individual de sugerencia */
+.suggestion-item {
+    /* Las siguientes clases ya están en tu HTML: */
+    /* padding: 0.5rem; */ /* p-2 */
+    /* cursor: pointer; */
+    /* background-color: #fff; */
+    /* transition: background-color 150ms ease-in-out; */ /* para el hover */
+}
+
+.suggestion-item:hover {
+    background-color: #f7fafc; /* hover:bg-gray-100 */
+}
+
+/* * Estilos para el mensaje de error del formulario
+ */
+#search-error {
+    color: #ef4444; /* text-red-500 */
+    font-size: 0.875rem; /* text-sm */
+    margin-top: 0.5rem; /* mt-2 */
+    text-align: center;
+    font-weight: 500; /* font-medium */
+}
