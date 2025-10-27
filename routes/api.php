@@ -5,6 +5,7 @@
 use App\Http\Controllers\RutaController;
 use App\Http\Controllers\ReservaController;
 use App\Http\Controllers\EmpresaDeTransporteController;
+use App\Http\Controllers\CiudadController; // Asegúrate de crear este controlador
 use Illuminate\Support\Facades\Route;
 
 // Rutas de Rutas (para obtener, crear rutas)
@@ -21,3 +22,6 @@ Route::get('reservas/{id}', [ReservaController::class, 'show']); // Obtener una 
 Route::get('empresas', [EmpresaDeTransporteController::class, 'index']); // Obtener todas las empresas
 Route::post('empresas', [EmpresaDeTransporteController::class, 'store']); // Crear una nueva empresa
 Route::get('empresas/{id}', [EmpresaDeTransporteController::class, 'show']); // Obtener una empresa específica
+
+// Ruta para buscar ciudades (autocompletado)
+Route::get('ciudades/buscar', [App\Http\Controllers\CiudadController::class, 'buscar']);
