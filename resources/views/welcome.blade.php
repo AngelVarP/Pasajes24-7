@@ -1,125 +1,189 @@
 <!DOCTYPE html>
-<html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
+<html lang="es">
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Pasajes24/7 - Tu viaje empieza aquí</title>
-    {{-- Vite incluirá aquí app.css con Tailwind --}}
-    @vite(['resources/css/app.css', 'resources/js/app.js'])
-    {{-- Considera añadir Animate.css si quieres usar las clases animate__ --}}
-    {{-- <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/> --}}
-</head>
-<body class="bg-gray-100 text-gray-800 font-sans antialiased">
+    <title>Pasajes24/7 - Tu Aventura en Bus Comienza Aquí</title>
+    <meta name="description" content="Diseña tu viaje perfecto. Encuentra y reserva pasajes de bus online con Pasajes24/7 de forma creativa y sencilla.">
 
-    {{-- Navbar (Ejemplo Básico) --}}
-    <nav class="bg-white shadow-md p-4 sticky top-0 z-50">
-        <div class="container mx-auto flex justify-between items-center">
-            <a href="/" class="text-2xl font-bold text-teal-600">Pasajes24/7</a>
-            <div>
-                {{-- Aquí podrían ir enlaces de navegación (Login, Registro, Mis Viajes) --}}
-                <a href="#" class="text-gray-600 hover:text-teal-600 px-3 py-2">Iniciar Sesión</a>
+    {{-- Google Fonts: Inter --}}
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+    @vite(['resources/css/app.css', 'resources/js/app.js'])
+
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+        ::placeholder { color: #94a3b8; opacity: 1; } /* slate-400 */
+        /* Custom focus ring */
+        input:focus, button:focus-visible {
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(245, 158, 11, 0.4); /* amber-500/40 */
+            border-color: #f59e0b; /* amber-500 */
+        }
+        /* Clip path for hero background shape */
+        .clip-path-fancy {
+            clip-path: polygon(0 0, 100% 0, 100% 85%, 0% 100%);
+        }
+        @media (min-width: 768px) { /* md breakpoint */
+            .clip-path-fancy {
+                 clip-path: polygon(0 0, 100% 0, 100% 75%, 50% 100%, 0 75%);
+            }
+        }
+    </style>
+</head>
+<body class="bg-gray-100 text-gray-800">
+
+    {{-- Navbar con fondo transparente inicial --}}
+    <header class="fixed top-0 left-0 right-0 z-50 transition-all duration-300" id="navbar">
+        <div class="container mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-20">
+                <a href="/" class="text-2xl font-bold text-white transition duration-150 drop-shadow-md">
+                    Pasajes<span class="font-semibold text-amber-400">24/7</span>
+                </a>
+                <a href="#" class="text-sm font-medium bg-white text-gray-800 px-4 py-2 rounded-full shadow-sm hover:bg-gray-200 transition duration-150 flex items-center">
+                    <svg class="w-5 h-5 mr-1.5 text-gray-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                    </svg>
+                    <span>Iniciar Sesión</span>
+                </a>
             </div>
         </div>
-    </nav>
+    </header>
 
-    {{-- Sección Hero --}}
-    <section class="w-full min-h-[calc(100vh-64px)] bg-gradient-to-r from-indigo-600 to-teal-500 flex flex-col justify-center items-center text-center p-6 md:p-8 relative overflow-hidden">
-        {{-- Podrías añadir una imagen de fondo sutil aquí --}}
-        <div class="absolute inset-0 bg-black opacity-20 z-0"></div>
-        <div class="relative z-10">
-            <h1 class="text-4xl md:text-6xl font-extrabold text-white mb-4 leading-tight animate__animated animate__fadeInDown">Tu Próximo Viaje Comienza Aquí</h1>
-            <p class="text-lg md:text-xl text-indigo-100 mb-8 max-w-3xl mx-auto animate__animated animate__fadeInUp animate__delay-1s">Encuentra y compra tus pasajes de bus fácil, rápido y seguro.</p>
+    {{-- Hero Section con forma y superposición --}}
+    <section class="relative bg-gradient-to-br from-gray-800 via-gray-900 to-black text-white pt-20 pb-24 md:pb-32 clip-path-fancy">
+         {{-- Opcional: Imagen de fondo sutil con overlay oscuro --}}
+         {{-- <div class="absolute inset-0 bg-cover bg-center opacity-20" style="background-image: url('URL_DE_IMAGEN_VIAJE.jpg');"></div> --}}
+         {{-- <div class="absolute inset-0 bg-black opacity-60"></div> --}}
 
-            {{-- Formulario de Búsqueda --}}
-            <div id="search-form-container" class="bg-white p-6 md:p-8 rounded-xl shadow-2xl w-full max-w-4xl mx-auto animate__animated animate__fadeInUp animate__delay-2s">
-                {{-- Cambiado a POST y añadido @csrf para seguridad si se convierte en un form real --}}
-                <form action="/buscar" method="POST" class="space-y-4 md:space-y-6" id="search-form">
-                     @csrf {{-- Importante si el form envía datos al backend --}}
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+         <div class="container mx-auto px-4 sm:px-6 lg:px-8 relative z-10 pt-16 md:pt-24 text-center">
+            <h1 class="text-4xl sm:text-5xl md:text-6xl font-extrabold mb-4 tracking-tight leading-tight">
+                Tu Próximo Destino <span class="text-amber-400">te Espera</span>.
+            </h1>
+            <p class="text-lg md:text-xl text-gray-300 mb-10 max-w-2xl mx-auto">Reserva pasajes de bus fácil y seguro. ¿A dónde vamos hoy?</p>
+         </div>
+    </section>
+
+    {{-- Formulario de Búsqueda Flotante --}}
+    <section class="relative z-20 -mt-20 md:-mt-28 pb-16">
+        <div class="container mx-auto px-4 sm:px-6 lg:px-8">
+            <div id="search-form-container" class="max-w-3xl mx-auto bg-white p-6 sm:p-8 rounded-2xl shadow-xl border border-gray-100">
+                <form action="/buscar" method="POST" class="space-y-5" id="search-form">
+                     @csrf
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
                         {{-- Campo Origen --}}
-                        <div class="relative">
-                            <label for="origen" class="block text-sm font-semibold text-gray-700 mb-1 text-left">Origen</label>
-                            <input type="text" id="origen" name="origen" class="w-full p-3 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-teal-500 transition duration-150" placeholder="Ciudad de origen" required>
-                            {{-- Contenedor para sugerencias de autocompletado --}}
-                            <div id="origen-suggestions" class="absolute z-10 w-full bg-white border border-gray-300 rounded-b-lg shadow-lg mt-1 hidden"></div>
+                        <div class="relative group">
+                            <label for="origen" class="block text-xs font-semibold text-gray-500 mb-1 uppercase tracking-wider">Origen</label>
+                            <div class="relative">
+                                <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none"><svg class="h-5 w-5 text-gray-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clip-rule="evenodd" /></svg></div>
+                                <input type="text" id="origen" name="origen" class="w-full pl-10 pr-3 py-2.5 border border-gray-300 rounded-lg shadow-sm focus:border-amber-500 transition duration-150 placeholder-gray-400 text-base" placeholder="Ingresa ciudad de origen" required>
+                            </div>
+                            <div id="origen-suggestions" class="absolute z-20 w-full bg-white border border-gray-200 rounded-b-lg shadow-lg mt-1 hidden max-h-52 overflow-y-auto text-left"></div>
                         </div>
                         {{-- Campo Destino --}}
-                        <div class="relative">
-                            <label for="destino" class="block text-sm font-semibold text-gray-700 mb-1 text-left">Destino</label>
-                            <input type="text" id="destino" name="destino" class="w-full p-3 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-teal-500 transition duration-150" placeholder="Ciudad de destino" required>
-                             {{-- Contenedor para sugerencias de autocompletado --}}
-                            <div id="destino-suggestions" class="absolute z-10 w-full bg-white border border-gray-300 rounded-b-lg shadow-lg mt-1 hidden"></div>
+                        <div class="relative group">
+                             <label for="destino" class="block text-xs font-semibold text-gray-500 mb-1 uppercase tracking-wider">Destino</label>
+                             <div class="relative">
+                                <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none"><svg class="h-5 w-5 text-gray-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clip-rule="evenodd" /></svg></div>
+                                <input type="text" id="destino" name="destino" class="w-full pl-10 pr-3 py-2.5 border border-gray-300 rounded-lg shadow-sm focus:border-amber-500 transition duration-150 placeholder-gray-400 text-base" placeholder="Ingresa ciudad de destino" required>
+                            </div>
+                            <div id="destino-suggestions" class="absolute z-20 w-full bg-white border border-gray-200 rounded-b-lg shadow-lg mt-1 hidden max-h-52 overflow-y-auto text-left"></div>
                         </div>
                     </div>
-                    {{-- Campo Fecha --}}
-                    <div class="w-full">
-                        <label for="fecha" class="block text-sm font-semibold text-gray-700 mb-1 text-left">Fecha de salida</label>
-                        {{-- Usar tipo "text" y un datepicker JS es a menudo mejor UX que type="date" --}}
-                        <input type="date" id="fecha" name="fecha" class="w-full p-3 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-teal-500 transition duration-150" required min="{{ date('Y-m-d') }}">
+                     {{-- Campo Fecha --}}
+                     <div class="relative group">
+                         <label for="fecha" class="block text-xs font-semibold text-gray-500 mb-1 uppercase tracking-wider">Fecha de Salida</label>
+                         <div class="relative">
+                            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none"><svg class="h-5 w-5 text-gray-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M6 2a1 1 0 00-1 1v1H4a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2h-1V3a1 1 0 10-2 0v1H7V3a1 1 0 00-1-1zm0 5a1 1 0 000 2h8a1 1 0 100-2H6z" clip-rule="evenodd" /></svg></div>
+                            <input type="date" id="fecha" name="fecha" class="w-full pl-10 pr-3 py-2.5 border border-gray-300 rounded-lg shadow-sm focus:border-amber-500 transition duration-150 text-gray-500 text-base" required min="{{ date('Y-m-d') }}">
+                         </div>
                     </div>
 
-                    {{-- Mensaje de Error (para JS) --}}
-                    <div id="search-error" class="text-red-500 text-sm mt-2 text-left hidden"></div>
+                    <div id="search-error" class="text-red-600 text-sm pt-1 text-left hidden font-medium"></div>
 
-                    {{-- Botón de Buscar --}}
-                    <button type="submit" class="w-full py-3 bg-teal-500 text-white rounded-lg font-semibold hover:bg-teal-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-teal-500 transition duration-300 shadow-lg transform hover:scale-105">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 inline-block mr-2" viewBox="0 0 20 20" fill="currentColor">
-                            <path fill-rule="evenodd" d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z" clip-rule="evenodd" />
-                        </svg>
+                    {{-- Botón de Buscar con gradiente y efecto --}}
+                    <button type="submit" class="w-full py-3 px-5 bg-gradient-to-r from-amber-500 to-orange-500 text-white rounded-lg font-semibold text-lg hover:from-amber-600 hover:to-orange-600 focus:outline-none focus:ring-offset-2 focus:ring-amber-500 transition duration-200 shadow-md hover:shadow-lg transform hover:-translate-y-0.5">
                         Buscar Pasajes
                     </button>
+                    <div class="mt-8 text-center">
+                        <img src="{{ asset('images/autobus-moderno.png') }}" alt="Autobús moderno en carretera" class="mx-auto max-w-full h-auto rounded-lg shadow-md">
+                    </div>
                 </form>
             </div>
         </div>
     </section>
 
-    {{-- Sección de Beneficios --}}
-    <section class="py-16 bg-white">
-        <div class="container mx-auto px-6 text-center">
-            <h2 class="text-3xl font-bold text-gray-800 mb-10">¿Por qué elegir Pasajes24/7?</h2>
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
-                {{-- Beneficio 1 --}}
-                <div class="p-6 bg-gray-50 rounded-lg shadow-md hover:shadow-xl transition-shadow duration-300 transform hover:-translate-y-1">
-                     {{-- Icono SVG Ejemplo --}}
-                     <svg class="w-12 h-12 mx-auto mb-4 text-teal-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0c-1.657 0-3-.895-3-2s1.343-2 3-2 3-.895 3-2-1.343-2-3-2m0 .01H12m0-.01V6m0 16.03V20m0 2v-2.03m0-10a3 3 0 11-6 0 3 3 0 016 0zm-6 3a3 3 0 106 0 3 3 0 00-6 0zm12 0a3 3 0 100-6 3 3 0 000 6z"></path></svg>
-                    <h3 class="text-xl font-semibold text-gray-700 mb-3">Precios Competitivos</h3>
-                    <p class="text-gray-600">Encuentra las mejores ofertas en pasajes de bus con precios accesibles para todos.</p>
-                </div>
-                {{-- Beneficio 2 --}}
-                 <div class="p-6 bg-gray-50 rounded-lg shadow-md hover:shadow-xl transition-shadow duration-300 transform hover:-translate-y-1">
-                     {{-- Icono SVG Ejemplo --}}
-                     <svg class="w-12 h-12 mx-auto mb-4 text-teal-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 18h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z"></path></svg>
-                    <h3 class="text-xl font-semibold text-gray-700 mb-3">Reserva Fácil y Rápida</h3>
-                    <p class="text-gray-600">Compra tus pasajes en minutos, sin complicaciones, desde cualquier lugar.</p>
-                </div>
-                {{-- Beneficio 3 --}}
-                 <div class="p-6 bg-gray-50 rounded-lg shadow-md hover:shadow-xl transition-shadow duration-300 transform hover:-translate-y-1">
-                     {{-- Icono SVG Ejemplo --}}
-                     <svg class="w-12 h-12 mx-auto mb-4 text-teal-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18.364 5.636l-3.536 3.536m0 5.656l3.536 3.536M9.172 9.172L5.636 5.636m3.536 9.192l-3.536 3.536M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-5 0a4 4 0 11-8 0 4 4 0 018 0z"></path></svg>
-                    <h3 class="text-xl font-semibold text-gray-700 mb-3">Soporte al Cliente 24/7</h3>
-                    <p class="text-gray-600">Estamos disponibles para ayudarte en cualquier momento. Tu experiencia es nuestra prioridad.</p>
-                </div>
-            </div>
-        </div>
-    </section>
+     {{-- Sección "Cómo Funciona" (Alternativa a Beneficios) --}}
+     <section id="como-funciona" class="py-16 sm:py-20 bg-gray-50">
+         <div class="container mx-auto px-4 sm:px-6 lg:px-8 text-center">
+             <h2 class="text-3xl font-bold text-gray-800 mb-4">Reservar es Simple</h2>
+             <p class="text-gray-500 mb-12 max-w-xl mx-auto">Sigue estos 3 pasos y estarás listo para tu viaje.</p>
+             <div class="grid grid-cols-1 md:grid-cols-3 gap-8 md:gap-12 relative">
+                 {{-- Línea conectora (visual) --}}
+                 <div class="hidden md:block absolute top-1/2 left-0 right-0 h-0.5 bg-gray-200 transform -translate-y-1/2 -mt-6" style="width: calc(100% - 10rem); left: 5rem;"></div>
 
-    {{-- Sección de Llamada a la Acción --}}
-    <section class="py-16 bg-teal-600 text-white text-center">
-        <div class="container mx-auto px-6">
-            <h2 class="text-3xl font-bold mb-4">¡No esperes más, tu aventura te espera!</h2>
-            <p class="text-lg mb-8">Encuentra tu próximo destino al mejor precio.</p>
-            {{-- Enlaza a la página de búsqueda/resultados si ya existe --}}
-            <a href="#search-form-container" class="bg-white text-teal-600 py-3 px-8 rounded-lg font-semibold hover:bg-gray-100 transition duration-300 shadow-lg transform hover:scale-105 inline-block">Buscar Pasajes Ahora</a>
-        </div>
-    </section>
+                 {{-- Paso 1 --}}
+                 <div class="relative z-10 text-center">
+                     <div class="flex items-center justify-center h-16 w-16 rounded-full bg-amber-100 text-amber-600 mx-auto mb-4 border-4 border-white shadow-sm font-bold text-xl">1</div>
+                     <h3 class="text-lg font-semibold text-gray-800 mb-2">Busca tu Viaje</h3>
+                     <p class="text-gray-500 text-sm">Ingresa origen, destino y fecha en el formulario.</p>
+                 </div>
+                 {{-- Paso 2 --}}
+                 <div class="relative z-10 text-center">
+                     <div class="flex items-center justify-center h-16 w-16 rounded-full bg-amber-100 text-amber-600 mx-auto mb-4 border-4 border-white shadow-sm font-bold text-xl">2</div>
+                     <h3 class="text-lg font-semibold text-gray-800 mb-2">Elige y Paga</h3>
+                     <p class="text-gray-500 text-sm">Selecciona el horario y asiento que prefieras. Paga seguro online.</p>
+                 </div>
+                  {{-- Paso 3 --}}
+                 <div class="relative z-10 text-center">
+                     <div class="flex items-center justify-center h-16 w-16 rounded-full bg-amber-100 text-amber-600 mx-auto mb-4 border-4 border-white shadow-sm font-bold text-xl">3</div>
+                     <h3 class="text-lg font-semibold text-gray-800 mb-2">¡Listo para Viajar!</h3>
+                     <p class="text-gray-500 text-sm">Recibe tu pasaje digital y prepárate para la aventura.</p>
+                 </div>
+             </div>
+         </div>
+     </section>
 
-    {{-- Footer --}}
-    <footer class="bg-gray-800 text-gray-400 py-8 mt-16">
-        <div class="container mx-auto text-center px-6">
-            {{-- Podrías añadir enlaces útiles aquí (Sobre nosotros, Contacto, FAQ, etc.) --}}
-            <p>&copy; {{ date('Y') }} Pasajes24/7. Todos los derechos reservados.</p>
+    {{-- Footer Simple --}}
+    <footer class="bg-gray-900 text-gray-400 py-10 mt-16">
+        <div class="container mx-auto px-4 sm:px-6 lg:px-8 text-center">
+            <nav class="flex justify-center space-x-6 mb-4 text-sm">
+                <a href="#" class="hover:text-amber-400 transition duration-150">Ayuda</a>
+                <a href="#" class="hover:text-amber-400 transition duration-150">Términos</a>
+                <a href="#" class="hover:text-amber-400 transition duration-150">Privacidad</a>
+            </nav>
+            <p class="text-xs">&copy; {{ date('Y') }} Pasajes24/7. Creado con ❤️ para viajeros.</p>
         </div>
     </footer>
 
+     {{-- Script para Navbar Transparente al inicio --}}
+     <script>
+        const navbar = document.getElementById('navbar');
+        if (navbar) {
+            const handleScroll = () => {
+                if (window.scrollY > 50) {
+                    navbar.classList.add('bg-gray-900', 'shadow-md');
+                    navbar.classList.remove('bg-transparent');
+                } else {
+                    navbar.classList.remove('bg-gray-900', 'shadow-md');
+                    navbar.classList.add('bg-transparent');
+                }
+            };
+            window.addEventListener('scroll', handleScroll, { passive: true });
+            // Ejecutar una vez al cargar por si la página carga ya scrolleada
+            handleScroll();
+        }
+
+        // Script para menú móvil (si lo necesitas)
+        // ... (el script del menú móvil anterior iría aquí) ...
+    </script>
+
 </body>
 </html>
+

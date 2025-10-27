@@ -24,4 +24,6 @@ Route::post('empresas', [EmpresaDeTransporteController::class, 'store']); // Cre
 Route::get('empresas/{id}', [EmpresaDeTransporteController::class, 'show']); // Obtener una empresa específica
 
 // Ruta para buscar ciudades (autocompletado)
-Route::get('ciudades/buscar', [App\Http\Controllers\CiudadController::class, 'buscar']);
+Route::get('ciudades/buscar', [CiudadController::class, 'buscar']); // No usar App\Http\Controllers\ aquí si ya se importó arriba
+
+// La llave extra ha sido eliminada
