@@ -6,19 +6,21 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
-    /**
-     * Run the migrations.
-     */
+    
+    // database/migrations/2025_10_27_031344_crear_tabla_empresas_de_transporte.php
+
     public function up(): void
     {
         Schema::create('empresas_de_transporte', function (Blueprint $table) {
-            $table->id(); // ID de la empresa
-            $table->string('nombre'); // Nombre de la empresa
-            $table->string('contacto'); // Información de contacto (teléfono, email)
-            $table->timestamps(); // Timestamps (created_at, updated_at)
+            $table->id();
+            $table->string('nombre');
+            $table->string('ruc', 11)->unique()->nullable();
+            $table->string('logo_url')->nullable(); // URL para el logo
+            $table->string('email_contacto')->nullable();
+            $table->string('telefono_contacto')->nullable();
+            $table->timestamps();
         });
     }
-
     /**
      * Reverse the migrations.
      */
