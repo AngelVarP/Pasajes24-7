@@ -1,7 +1,5 @@
 <?php
 
-// app/Models/Reserva.php
-
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -11,21 +9,27 @@ class Reserva extends Model
 {
     use HasFactory;
 
+    protected $table = 'reservas';
     protected $fillable = [
-        'usuario_id',
-        'ruta_id',
-        'asiento',
+        'viaje_id', 'user_id', 'codigo_reserva', 'monto_total', 'estado',
+        'nombre_pasajero', 'dni_pasajero', 'email_pasajero', 'telefono_pasajero'
     ];
 
-    // Relación con el modelo Usuario
-    public function usuario()
+    // Relación: Una reserva pertenece a un viaje
+    public function viaje()
     {
-        return $this->belongsTo(User::class, 'usuario_id');
+        return $this->belongsTo(Viaje::class, 'viaje_id');
     }
 
-    // Relación con el modelo Ruta
-    public function ruta()
+    // Relación: Una reserva pertenece a un usuario (si está logueado)
+    public function user()
     {
-        return $this->belongsTo(Ruta::class, 'ruta_id');
+        return $this->belongsTo(User::class, 'user_id');
+    }
+
+    // Relación con asientos (muchos a muchos a través de la tabla pivote)
+    public function asientos()
+    {
+        return $this->belongsToMany(Asiento::class, 'reserva_asiento', 'reserva_id', 'asiento_id');
     }
 }
