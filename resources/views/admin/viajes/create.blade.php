@@ -68,8 +68,8 @@
                     <span>Crear Viaje</span>
                 </a>
                 {{-- ... (otros enlaces del sidebar) ... --}}
-                <a href="#" class="flex items-center px-4 py-2.5 rounded-lg text-sm font-medium hover:bg-gray-700 hover:text-amber-500">
-                    <svg class="w-5 h-5 mr-3 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 10h16M4 14h16M4 18h16"></path></svg>
+                <a href="{{ route('admin.viajes.index') }}" class="flex items-center px-4 py-2.5 rounded-lg text-sm font-medium hover:bg-gray-700 hover:text-amber-500">
+                    <img src="{{ asset('images/logo-pasajes24-7.png') }}" alt="Logo" class="h-5 w-auto mr-3 flex-shrink-0 filter brightness-0 invert">
                     <span>Gestionar Viajes</span>
                 </a>
                 <a href="#" class="flex items-center px-4 py-2.5 rounded-lg text-sm font-medium hover:bg-gray-700 hover:text-amber-500">
