@@ -42,4 +42,7 @@ Route::prefix('admin')
     // ⭐ RUTA NUEVA para Cancelar un Viaje ⭐
     Route::post('/viajes/{viaje}/cancelar', [ViajeAdminController::class, 'cancelar'])->name('viajes.cancelar');
     // ... (otras rutas si las tienes) ...
+
+    // ⭐ RUTA NUEVA para actualizar estados manualmente ⭐
+    Route::post('/viajes/actualizar-estados', [App\Http\Controllers\ViajeAdminController::class, 'actualizarEstadosManualmente'])->name('viajes.actualizarEstados');
 });

@@ -187,4 +187,56 @@ class ViajeAdminController extends Controller
         return redirect()->route('admin.viajes.index')->with('error', 'El viaje #'.$viaje->id.' no puede ser cancelado.');
     }
 
+/**
+     * Actualiza manualmente los estados de los viajes a 'en_curso' o 'completado'.
+     * Ejecuta la misma lógica que el comando programado, pero bajo demanda.
+     *
+     * @return \Illuminate\Http\RedirectResponse
+     */
+    public function actualizarEstadosManualmente()
+    {
+        $now = Carbon::now();
+        $updatedEnCurso = 0;
+        $updatedCompletado = 0;
+
+        // 1. Marcar como "en_curso"
+        $viajesParaEmpezar = Viaje::where('estado', 'programado')
+                                    ->whereRaw("CONCAT(fecha_salida, ' ', hora_salida) <= ?", [$now->toDateTimeString()])
+                                    ->get();
+
+        foreach ($viajesParaEmpezar as $viaje) {
+            $viaje->update(['estado' => 'en_curso']);
+            $updatedEnCurso++;
+        }
+
+        // 2. Marcar como "completado"
+        $viajesParaCompletar = Viaje::where('estado', 'en_curso')
+                                      ->with('ruta') // Necesitamos la duración
+                                      ->get()
+                                      ->filter(function ($viaje) use ($now) {
+                                          if (empty($viaje->ruta->duracion_estimada_minutos)) return false;
+
+                                          // Calcula la hora de llegada estimada
+                                          $horaSalida = Carbon::parse($viaje->fecha_salida . ' ' . $viaje->hora_salida);
+                                          $horaLlegadaEstimada = $horaSalida->addMinutes($viaje->ruta->duracion_estimada_minutos);
+
+                                          return $now->isAfter($horaLlegadaEstimada); 
+                                      });
+
+        foreach ($viajesParaCompletar as $viaje) {
+            $viaje->update(['estado' => 'completado']);
+            $updatedCompletado++;
+        }
+
+        // Construir mensaje de éxito
+        $message = "Actualización de estados completada. ";
+        if ($updatedEnCurso > 0) $message .= "$updatedEnCurso viajes marcados como 'en curso'. ";
+        if ($updatedCompletado > 0) $message .= "$updatedCompletado viajes marcados como 'completado'. ";
+        if ($updatedEnCurso == 0 && $updatedCompletado == 0) $message .= "No hubo cambios.";
+
+        // Redirigir de vuelta a la lista de viajes con el mensaje
+        return redirect()->route('admin.viajes.index')->with('success', $message);
+    }
+
+
 }

@@ -95,18 +95,35 @@
             {{-- Área de Contenido Principal del Listado --}}
             <main class="flex-grow p-6 lg:p-10 main-content-bg">
                 
-                {{-- Encabezado y Botón Crear --}}
+
+                {{-- Encabezado y Botones --}}
                 <div class="flex justify-between items-center mb-8 border-b pb-4 border-gray-300">
                     <h2 class="text-2xl font-bold text-gray-800 flex items-center">
                         <svg class="w-6 h-6 mr-3 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 10h16M4 14h16M4 18h16"></path></svg>
                         Listado de Viajes Programados
                     </h2>
-                    <a href="{{ route('admin.viajes.create') }}" 
-                       class="bg-gradient-to-r from-amber-500 to-orange-500 text-white font-bold py-2 px-4 rounded-lg shadow-md hover:shadow-lg hover:from-amber-600 hover:to-orange-600 transition duration-200 transform hover:-translate-y-0.5 flex items-center text-sm">
-                        <svg class="w-5 h-5 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
-                        Crear Nuevo Viaje
-                    </a>
+
+                    {{-- Contenedor para botones --}}
+                    <div class="flex space-x-3">
+                        {{-- Botón para Actualizar Estados --}}
+                        <form action="{{ route('admin.viajes.actualizarEstados') }}" method="POST">
+                            @csrf
+                            <button type="submit"
+                                    class="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded-lg shadow-md hover:shadow-lg transition duration-200 transform hover:-translate-y-0.5 flex items-center text-sm">
+                            <svg class="w-5 h-5 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m-15.357-2a8.001 8.001 0 0015.058 2m0 0H15"></path></svg>
+                                Actualizar Estados
+                            </button>
+                        </form>
+
+                        {{-- Botón Crear Nuevo Viaje --}}
+                        <a href="{{ route('admin.viajes.create') }}" 
+                        class="bg-gradient-to-r from-amber-500 to-orange-500 text-white font-bold py-2 px-4 rounded-lg shadow-md hover:shadow-lg hover:from-amber-600 hover:to-orange-600 transition duration-200 transform hover:-translate-y-0.5 flex items-center text-sm">
+                            <svg class="w-5 h-5 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
+                            Crear Nuevo Viaje
+                        </a>
+                    </div>
                 </div>
+
 
                 {{-- Contenedor de la Tabla --}}
                 <div class="bg-white rounded-lg shadow-xl overflow-x-auto">
