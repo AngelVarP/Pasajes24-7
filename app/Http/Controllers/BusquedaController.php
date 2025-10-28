@@ -42,6 +42,7 @@ class BusquedaController extends Controller
                   ->where('destino_id', $destino->id);
         })
         ->whereDate('fecha_salida', $request->fecha) // Filtrar por la fecha exacta
+        ->where('estado', '!=', 'cancelado') // <-- Solo mostrar viajes NO cancelados
         ->with(['empresa', 'ruta.origen', 'ruta.destino']) // Cargar relaciones para mostrarlas en la vista
         ->orderBy('hora_salida') // Ordenar por hora
         ->get();
