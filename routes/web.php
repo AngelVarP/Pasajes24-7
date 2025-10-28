@@ -36,8 +36,10 @@ Route::prefix('admin')
     Route::post('/viajes', [ViajeAdminController::class, 'store'])->name('viajes.store');
 
     // Aquí irían las rutas para editar/eliminar que añadiremos más adelante.
-    // Route::get('/viajes/{viaje}/editar', [ViajeAdminController::class, 'edit'])->name('viajes.edit');
-    // Route::put('/viajes/{viaje}', [ViajeAdminController::class, 'update'])->name('viajes.update');
+    Route::get('/viajes/{viaje}/editar', [ViajeAdminController::class, 'edit'])->name('viajes.edit');
+    Route::put('/viajes/{viaje}', [ViajeAdminController::class, 'update'])->name('viajes.update');
 
+    // ⭐ RUTA NUEVA para Cancelar un Viaje ⭐
+    Route::post('/viajes/{viaje}/cancelar', [ViajeAdminController::class, 'cancelar'])->name('viajes.cancelar');
     // ... (otras rutas si las tienes) ...
 });

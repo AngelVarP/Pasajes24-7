@@ -152,11 +152,23 @@
                                             {{ str_replace('_', ' ', $viaje->estado) }}
                                         </span>
                                     </td>
+                                
+
                                     <td class="px-6 py-4 whitespace-nowrap text-sm font-medium space-x-2">
-                                        {{-- Los enlaces de Editar/Cancelar los implementaremos después para evitar complejidades ahora --}}
-                                        <a href="#" class="text-blue-600 hover:text-blue-900 transition duration-150">Editar</a>
-                                        <a href="#" class="text-red-600 hover:text-red-900 transition duration-150">Cancelar</a>
+                                        {{-- Botón Editar --}}
+                                        <a href="{{ route('admin.viajes.edit', $viaje) }}" class="text-blue-600 hover:text-blue-900 transition duration-150">Editar</a>
+                                        
+                                        {{-- Botón Cancelar (como formulario POST para mayor seguridad) --}}
+                                        @if ($viaje->estado === 'programado' || $viaje->estado === 'en_curso')
+                                            <form action="{{ route('admin.viajes.cancelar', $viaje) }}" method="POST" class="inline-block" onsubmit="return confirm('¿Estás seguro de que deseas cancelar este viaje? Esto no se puede deshacer fácilmente.');">
+                                                @csrf
+                                                <button type="submit" class="text-red-600 hover:text-red-900 transition duration-150 focus:outline-none">Cancelar</button>
+                                            </form>
+                                        @else
+                                            <span class="text-gray-400 cursor-not-allowed">Cancelar</span> {{-- Deshabilitado --}}
+                                        @endif
                                     </td>
+
                                 </tr>
                             @empty
                                 <tr>
