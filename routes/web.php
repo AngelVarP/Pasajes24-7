@@ -32,3 +32,4 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'admin'])->group(fun
     
     // Aquí irán las rutas para listar, editar, eliminar viajes, gestionar rutas, etc.
 });
+

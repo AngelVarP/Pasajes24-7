@@ -35,22 +35,47 @@
 <body class="bg-gray-100 text-gray-800"> {{-- Quitamos flex flex-col min-h-screen --}}
 
     {{-- Navbar con fondo transparente inicial (Propio de Welcome) --}}
+    {{-- Navbar con fondo transparente inicial (Propio de Welcome) --}}
     <header class="fixed top-0 left-0 right-0 z-50 transition-all duration-300" id="navbar">
         <div class="container mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="flex justify-between items-center py-4" id="navbar-content"> {{-- Usamos py-4 --}}
+            {{-- Contenedor Flex para alinear logo a la izq y botón a la der --}}
+            <div class="flex justify-between items-center py-4" id="navbar-content"> 
+                
+                {{-- Logo a la izquierda --}}
                 <a href="/" class="transition duration-150 drop-shadow-md">
-                    {{-- Usa tu logo --}}
-                    <img src="{{ asset('images/logo-pasajes24-7-2.png') }}" alt="Logo Pasajes24/7" class="h-[60px] w-auto logo-img"> 
+                    <img src="{{ asset('images/logo-pasajes24-7-2.png') }}" alt="Logo Pasajes24/7" class="h-[120px] w-auto logo-img"> 
                 </a>
 
-                {{-- ***** BOTÓN ACCESO ADMINISTRADOR ***** --}}
-                {{-- Por ahora, apunta directamente a la ruta de login --}}
-                {{-- Más adelante, lo haremos condicional con @auth --}}
-                <a href="{{ route('admin.login') }}" class="text-sm font-medium bg-white text-gray-800 px-4 py-2 rounded-full shadow-sm hover:bg-gray-200 transition duration-150 flex items-center login-button">
-                    <svg class="w-5 h-5 mr-1.5 text-gray-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" /></svg>
-                    <span>Acceso Admin</span>
-                </a>
-                {{-- ***** FIN BOTÓN ***** --}}
+                {{-- Contenedor para enlaces/botones a la derecha --}}
+                <div class="flex items-center space-x-4">
+                    @auth {{-- Si el usuario está autenticado --}}
+                        @if(Auth::user()->is_admin)
+                            {{-- Enlace al Panel de Administración --}}
+                            <a href="{{ route('admin.dashboard') }}" 
+                               class="text-sm font-medium text-white hover:text-amber-300 transition duration-150 nav-link">
+                               Panel Admin
+                            </a>
+                        @endif
+            
+                        {{-- Botón de Logout --}}
+                        <form method="POST" action="{{ route('admin.logout') }}" class="m-0 p-0"> {{-- Estilos para que el form no afecte layout --}}
+                            @csrf
+                            <button type="submit" 
+                                    class="text-sm font-medium text-gray-300 hover:text-white transition duration-150 nav-link bg-transparent border-none p-0 cursor-pointer">
+                                Cerrar Sesión
+                            </button>
+                        </form>
+                    @else {{-- Si el usuario NO está autenticado --}}
+                        {{-- Botón para ir al Login de Admin --}}
+                        <a href="{{ route('admin.login') }}" 
+                           class="text-sm font-medium bg-white text-gray-800 px-4 py-2 rounded-full shadow-sm hover:bg-gray-200 transition duration-150 flex items-center login-button">
+                            <svg class="w-5 h-5 mr-1.5 text-gray-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" /></svg>
+                            <span>Acceso Admin</span>
+                        </a>
+                    @endauth
+                </div>
+                {{-- Fin del contenedor derecho --}}
+
             </div>
         </div>
     </header>
