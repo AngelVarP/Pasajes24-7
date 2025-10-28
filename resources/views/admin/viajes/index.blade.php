@@ -152,20 +152,30 @@
                                             {{ str_replace('_', ' ', $viaje->estado) }}
                                         </span>
                                     </td>
-                                
 
                                     <td class="px-6 py-4 whitespace-nowrap text-sm font-medium space-x-2">
-                                        {{-- Botón Editar --}}
-                                        <a href="{{ route('admin.viajes.edit', $viaje) }}" class="text-blue-600 hover:text-blue-900 transition duration-150">Editar</a>
-                                        
-                                        {{-- Botón Cancelar (como formulario POST para mayor seguridad) --}}
+                                        {{-- Botón Editar (Condicional) --}}
                                         @if ($viaje->estado === 'programado' || $viaje->estado === 'en_curso')
-                                            <form action="{{ route('admin.viajes.cancelar', $viaje) }}" method="POST" class="inline-block" onsubmit="return confirm('¿Estás seguro de que deseas cancelar este viaje? Esto no se puede deshacer fácilmente.');">
+                                            <a href="{{ route('admin.viajes.edit', $viaje) }}"
+                                            class="text-indigo-600 hover:text-indigo-900 transition duration-150 ease-in-out">
+                                            Editar
+                                            </a>
+                                        @else
+                                            {{-- Muestra texto deshabilitado si está cancelado o completado --}}
+                                            <span class="text-gray-400 cursor-not-allowed">Editar</span>
+                                        @endif
+
+                                        {{-- Botón Cancelar (Formulario POST) --}}
+                                        @if ($viaje->estado === 'programado' || $viaje->estado === 'en_curso')
+                                            <form action="{{ route('admin.viajes.cancelar', $viaje) }}" method="POST" class="inline-block" onsubmit="return confirm('¿Estás seguro de que deseas cancelar este viaje?');">
                                                 @csrf
-                                                <button type="submit" class="text-red-600 hover:text-red-900 transition duration-150 focus:outline-none">Cancelar</button>
+                                                <button type="submit"
+                                                        class="text-red-600 hover:text-red-900 transition duration-150 ease-in-out focus:outline-none bg-transparent border-none p-0 cursor-pointer">
+                                                    Cancelar
+                                                </button>
                                             </form>
                                         @else
-                                            <span class="text-gray-400 cursor-not-allowed">Cancelar</span> {{-- Deshabilitado --}}
+                                            <span class="text-gray-400 cursor-not-allowed">Cancelar</span>
                                         @endif
                                     </td>
 

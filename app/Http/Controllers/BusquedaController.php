@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\Viaje; // Importamos el modelo Viaje
 use App\Models\Ciudad; // Importamos el modelo Ciudad
+use Carbon\Carbon;
 
 class BusquedaController extends Controller
 {
@@ -35,17 +36,27 @@ class BusquedaController extends Controller
             return back()->withErrors(['error' => 'La ciudad de origen o destino no es válida. Por favor, usa las sugerencias.']);
         }
 
+        $fechaBuscada = Carbon::parse($request->fecha)->startOfDay();
+
         // 3. Realizar la consulta
         $viajes = Viaje::whereHas('ruta', function ($query) use ($origen, $destino) {
             // Buscar en la tabla 'rutas' usando los IDs de ciudad
             $query->where('origen_id', $origen->id)
                   ->where('destino_id', $destino->id);
         })
-        ->whereDate('fecha_salida', $request->fecha) // Filtrar por la fecha exacta
-        ->where('estado', '!=', 'cancelado') // <-- Solo mostrar viajes NO cancelados
-        ->with(['empresa', 'ruta.origen', 'ruta.destino']) // Cargar relaciones para mostrarlas en la vista
-        ->orderBy('hora_salida') // Ordenar por hora
+        
+        ->whereDate('fecha_salida', $fechaBuscada)
+        // ***** MODIFICACIÓN AQUÍ *****
+        ->whereNotIn('estado', ['cancelado', 'en_curso', 'completado']) // Solo mostrar 'programado'
+        // *******************************
+        ->when($fechaBuscada->isToday(), function ($query) {
+             $query->whereTime('hora_salida', '>', now()->format('H:i:s'));
+        })
+        ->with(['empresa', 'ruta.origen', 'ruta.destino'])
+        ->orderBy('hora_salida')
         ->get();
+
+
 
         // 4. Devolver la vista con los resultados
         return view('resultados', [
