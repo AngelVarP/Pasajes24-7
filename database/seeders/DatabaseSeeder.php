@@ -20,6 +20,7 @@ class DatabaseSeeder extends Seeder
             EmpresaDeTransporteSeeder::class, // Luego las empresas
             RutaSeeder::class, // Luego las rutas (dependen de ciudades)
             ViajeSeeder::class, // Finalmente los viajes (dependen de rutas y empresas)
+            AdminUserSeeder::class,
             // AsientoSeeder::class, // No necesitamos un seeder de Asiento separado, se crean en ViajeSeeder
         ]);
     }
