@@ -172,7 +172,7 @@
 
                                     <td class="px-6 py-4 whitespace-nowrap text-sm font-medium space-x-2">
                                         {{-- Botón Editar (Condicional) --}}
-                                        @if ($viaje->estado === 'programado' || $viaje->estado === 'en_curso')
+                                        @if ($viaje->estado === 'programado' )
                                             <a href="{{ route('admin.viajes.edit', $viaje) }}"
                                             class="text-indigo-600 hover:text-indigo-900 transition duration-150 ease-in-out">
                                             Editar
