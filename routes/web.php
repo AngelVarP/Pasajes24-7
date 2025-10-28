@@ -18,18 +18,26 @@ Route::post('/admin/login', [LoginController::class, 'login']);
 // Añadimos la ruta POST para el logout
 Route::post('/admin/logout', [LoginController::class, 'logout'])->name('admin.logout'); 
 
-// Rutas de Administración (¡AHORA PROTEGIDAS!)
-Route::prefix('admin')->name('admin.')->middleware(['auth', 'admin'])->group(function () { // <-- AÑADIDO MIDDLEWARE
-    
-    // Dashboard Básico (Crearemos esta vista después)
+
+// Rutas protegidas por el middleware 'auth' y 'admin'
+Route::prefix('admin')
+    ->name('admin.')
+    ->middleware(['auth', 'admin'])
+    ->group(function () {
+
+    // Dashboard
     Route::get('/', function () { 
-        return view('admin.dashboard'); // Vista simple para el panel principal
+        return view('admin.dashboard'); 
     })->name('dashboard'); 
-    
-    // Rutas existentes de Viajes
+
+    // Rutas de Viajes CRUD
+    Route::get('/viajes', [ViajeAdminController::class, 'index'])->name('viajes.index'); // <--- ¡ASEGÚRATE DE QUE ESTA LÍNEA ESTÉ PRESENTE!
     Route::get('/viajes/crear', [ViajeAdminController::class, 'create'])->name('viajes.create');
     Route::post('/viajes', [ViajeAdminController::class, 'store'])->name('viajes.store');
-    
-    // Aquí irán las rutas para listar, editar, eliminar viajes, gestionar rutas, etc.
-});
 
+    // Aquí irían las rutas para editar/eliminar que añadiremos más adelante.
+    // Route::get('/viajes/{viaje}/editar', [ViajeAdminController::class, 'edit'])->name('viajes.edit');
+    // Route::put('/viajes/{viaje}', [ViajeAdminController::class, 'update'])->name('viajes.update');
+
+    // ... (otras rutas si las tienes) ...
+});

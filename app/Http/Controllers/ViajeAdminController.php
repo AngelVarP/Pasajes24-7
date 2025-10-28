@@ -3,21 +3,40 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use App\Models\Ruta; // <-- Necesario para el create()
-use App\Models\EmpresaDeTransporte; // <-- Necesario para el create()
-use App\Models\Viaje; // <-- Necesario para el store()
-use App\Models\Asiento; // <-- Necesario para el store()
+use App\Models\Ruta; 
+use App\Models\EmpresaDeTransporte; 
+use App\Models\Viaje; // <--- ¡ASEGÚRATE DE QUE ESTA LÍNEA ESTÉ PRESENTE!
+use App\Models\Asiento; 
+use Illuminate\Validation\ValidationException; 
+use Carbon\Carbon; // Para manejar fechas si es necesario en la vista o lógica
 
 class ViajeAdminController extends Controller
 {
     /**
-     * Muestra el formulario para crear un nuevo viaje, pasando las rutas y empresas.
+     * Muestra el listado paginado de viajes para el administrador.
+     * Corresponde a la sección "Gestionar Viajes".
      *
      * @return \Illuminate\View\View
      */
+    public function index()
+    {
+        // Obtiene todos los viajes, cargando las relaciones necesarias (Ruta, Origen, Destino, Empresa)
+        // para poder mostrar sus nombres directamente en la tabla.
+        // Los ordena por fecha y hora de salida de forma descendente y los pagina.
+        $viajes = Viaje::with(['ruta.origen', 'ruta.destino', 'empresa'])
+                        ->orderBy('fecha_salida', 'asc')
+                        ->orderBy('hora_salida', 'asc')
+                        ->paginate(15); // Muestra 15 viajes por página
+
+        // Pasa la colección de viajes paginados a la vista 'admin.viajes.index'
+        return view('admin.viajes.index', compact('viajes'));
+    }
+
+    /**
+     * Muestra el formulario para crear un nuevo viaje.
+     */
     public function create()
     {
-        // Esta lógica es necesaria para llenar los <select> del formulario
         $rutas = Ruta::with(['origen', 'destino'])->get(); 
         $empresas = EmpresaDeTransporte::all(); 
 
@@ -25,14 +44,11 @@ class ViajeAdminController extends Controller
     }
 
     /**
-     * Guarda un nuevo viaje en la base de datos.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\RedirectResponse
+     * Guarda un nuevo viaje en la base de datos y genera sus asientos.
      */
     public function store(Request $request)
     {
-        // 1. Validación de los datos del formulario (CORREGIDA)
+        // Validación de los datos del formulario
         $request->validate([
             'ruta_id' => 'required|exists:rutas,id',
             'empresa_id' => 'required|exists:empresas_de_transporte,id',
@@ -43,31 +59,30 @@ class ViajeAdminController extends Controller
             'tipo_servicio' => 'required|string|max:255',
         ]);
 
-        // 2. Crear el nuevo viaje en la tabla 'viajes'
+        // Crear el nuevo viaje
         $viaje = Viaje::create([
             'ruta_id' => $request->ruta_id,
             'empresa_id' => $request->empresa_id,
             'fecha_salida' => $request->fecha_salida,
-            'hora_salida' => $request->hora_salida . ':00', // Añadir segundos
+            'hora_salida' => $request->hora_salida . ':00', // Asegura formato HH:MM:SS
             'precio' => $request->precio,
             'asientos_totales' => $request->asientos_totales,
-            'asientos_disponibles' => $request->asientos_totales, // Al inicio, todos disponibles
+            'asientos_disponibles' => $request->asientos_totales, 
             'tipo_servicio' => $request->tipo_servicio,
-            'estado' => 'programado', // Por defecto
+            'estado' => 'programado', 
         ]);
 
-        // 3. Crear los asientos individuales para el viaje (en la tabla 'asientos')
+        // Generar los asientos individuales para el viaje
         for ($i = 1; $i <= $viaje->asientos_totales; $i++) {
             Asiento::create([
                 'viaje_id' => $viaje->id,
-                'numero_asiento' => (string)$i,
-                'piso' => 1, // Por defecto piso 1
+                'numero_asiento' => (string)$i, // Convertir a string para consistencia con DB
+                'piso' => 1, 
                 'estado' => 'disponible',
-                'precio_adicional' => 0.00
+                'precio_adicional' => 0, 
             ]);
         }
 
-        // 4. Redirigir con un mensaje de éxito
-        return redirect()->route('admin.viajes.create')->with('success', 'Viaje creado exitosamente y asientos generados.');
+        return redirect()->route('admin.viajes.index')->with('success', 'Viaje creado exitosamente y asientos generados.');
     }
 }
