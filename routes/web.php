@@ -6,7 +6,8 @@ use App\Http\Controllers\CiudadController;
 use App\Http\Controllers\BusquedaController;
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\ViajeAdminController;
-use App\Http\Controllers\ReservaController; // <-- Importante
+use App\Http\Controllers\ReservaController;
+use App\Http\Controllers\RutaAdminController; // <-- Importante
 
 // Ruta principal (Homepage) AHORA SÍ TIENE NOMBRE
 Route::get('/', [HomeController::class, 'index'])->name('home'); 
@@ -58,5 +59,6 @@ Route::prefix('admin')
     Route::put('/viajes/{viaje}', [ViajeAdminController::class, 'update'])->name('viajes.update');
     Route::post('/viajes/{viaje}/cancelar', [ViajeAdminController::class, 'cancelar'])->name('viajes.cancelar');
     Route::post('/viajes/actualizar-estados', [App\Http\Controllers\ViajeAdminController::class, 'actualizarEstadosManualmente'])->name('viajes.actualizarEstados');
+    Route::resource('rutas', App\Http\Controllers\RutaAdminController::class)->except(['show']); // Asegúrate de incluir el namespace completo si es necesario
 });
 // (Y ya no tiene la llave "}" extra que tenías al final)
