@@ -20,6 +20,10 @@ Route::get('/viajes/{viaje}/asientos', [BusquedaController::class, 'mostrarAsien
 
 // Ruta para PROCESAR la selección (la que usa el formulario)
 Route::post('/reservar/store', [ReservaController::class, 'store'])->name('reservas.store');
+
+// Paso 3 (POST): Recibe datos de pasajeros, valida, guarda en sesión y procede al pago
+Route::post('/reservar/procesar-pasajeros', [ReservaController::class, 'procesarPasajeros'])->name('reservas.procesar_pasajeros'); // <-- NUEVA RUTA
+
 // ---------------------------------
 
 
