@@ -1,9 +1,12 @@
 <?php
 // Usamos el array de sesión como fuente principal de datos
 $reservaData = session('reserva_temporal');
-$total = $reservaData['total'] ?? 0; 
-$asientoIds = $reservaData['asiento_ids'] ?? [];
-$numAsientos = count($asientoIds); 
+// NOTA CLAVE: Si el controlador pasa $asientosResumen, lo usamos. Si no (ej. después de un error de validación), lo buscamos en la sesión.
+$asientosResumen = $asientosResumen ?? $reservaData['asientos_detalles'] ?? []; 
+$total = $total ?? $reservaData['total'] ?? 0;
+$numAsientos = count($asientosResumen); 
+// Los números de asiento para el título se extraen del nuevo array de resumen
+$asientosSeleccionados = $asientosSeleccionados ?? collect($asientosResumen)->pluck('numero_asiento');
 ?>
 <!DOCTYPE html>
 <html lang="es">
@@ -119,50 +122,51 @@ $numAsientos = count($asientoIds);
                         <input type="hidden" name="viaje_id" value="{{ $viaje->id }}">
                         
                         {{-- IDs de asientos (pasamos los IDs de vuelta, ya validados) --}}
-                        @foreach ($asientoIds as $index => $asiento_id)
+                        @foreach ($reservaData['asiento_ids'] ?? [] as $index => $asiento_id)
                             <input type="hidden" name="asiento_ids[]" value="{{ $asiento_id }}">
                         @endforeach
                         
                         
                         {{-- ----------------------------------------------------- --}}
                         {{-- Bloque de Datos de los Pasajeros (Dinámico por Asiento) --}}
+                        {{-- (Fichas con borde azul) --}}
                         {{-- ----------------------------------------------------- --}}
                         @foreach ($asientosSeleccionados as $index => $numero_asiento)
-                        <div class="bg-white p-6 rounded-xl shadow-lg border border-gray-200">
-                            <h2 class="text-xl font-bold text-gray-900 mb-4 pb-2 border-b">
+                        <div class="bg-white p-6 rounded-xl shadow-lg border-l-4 border-blue-600 transition duration-300 hover:shadow-xl">
+                            <h2 class="text-xl font-bold text-gray-900 mb-4 pb-2 border-b border-gray-200">
                                 Pasajero {{ $index + 1 }} (Asiento N° <span class="text-amber-600">{{ $numero_asiento }}</span>)
                             </h2>
                             <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
                                 
                                 {{-- Nombre --}}
                                 <div>
-                                    <label for="nombre_{{ $index }}" class="block text-sm font-medium text-gray-700">Nombre</label>
+                                    <label for="nombre_{{ $index }}" class="block text-sm font-bold text-gray-700 mb-1">Nombre</label>
                                     <input type="text" id="nombre_{{ $index }}" name="pasajeros[{{ $index }}][nombre]" 
-                                           class="mt-1 block w-full py-2 px-3 border border-gray-300 rounded-md shadow-sm focus:ring-amber-500 focus:border-amber-500" 
+                                           class="w-full py-2 px-3 border border-gray-200 bg-white rounded-md shadow-inner focus:border-amber-500 focus:ring-amber-500 transition duration-150" 
                                            placeholder="Nombre" required>
                                 </div>
                                 
                                 {{-- Apellido --}}
                                 <div>
-                                    <label for="apellido_{{ $index }}" class="block text-sm font-medium text-gray-700">Apellido</label>
+                                    <label for="apellido_{{ $index }}" class="block text-sm font-bold text-gray-700 mb-1">Apellido</label>
                                     <input type="text" id="apellido_{{ $index }}" name="pasajeros[{{ $index }}][apellido]" 
-                                           class="mt-1 block w-full py-2 px-3 border border-gray-300 rounded-md shadow-sm focus:ring-amber-500 focus:border-amber-500" 
+                                           class="w-full py-2 px-3 border border-gray-200 bg-white rounded-md shadow-inner focus:border-amber-500 focus:ring-amber-500 transition duration-150" 
                                            placeholder="Apellido" required>
                                 </div>
                                 
                                 {{-- DNI --}}
                                 <div>
-                                    <label for="dni_{{ $index }}" class="block text-sm font-medium text-gray-700">DNI</label>
+                                    <label for="dni_{{ $index }}" class="block text-sm font-bold text-gray-700 mb-1">DNI</label>
                                     <input type="text" id="dni_{{ $index }}" name="pasajeros[{{ $index }}][dni]" 
-                                           class="mt-1 block w-full py-2 px-3 border border-gray-300 rounded-md shadow-sm focus:ring-amber-500 focus:border-amber-500" 
+                                           class="w-full py-2 px-3 border border-gray-200 bg-white rounded-md shadow-inner focus:border-amber-500 focus:ring-amber-500 transition duration-150" 
                                            placeholder="DNI" required>
                                 </div>
 
                                 {{-- Edad --}}
                                 <div>
-                                    <label for="edad_{{ $index }}" class="block text-sm font-medium text-gray-700">Edad</label>
+                                    <label for="edad_{{ $index }}" class="block text-sm font-bold text-gray-700 mb-1">Edad</label>
                                     <input type="number" min="1" max="120" id="edad_{{ $index }}" name="pasajeros[{{ $index }}][edad]" 
-                                           class="mt-1 block w-full py-2 px-3 border border-gray-300 rounded-md shadow-sm focus:ring-amber-500 focus:border-amber-500" 
+                                           class="w-full py-2 px-3 border border-gray-200 bg-white rounded-md shadow-inner focus:border-amber-500 focus:ring-amber-500 transition duration-150" 
                                            placeholder="Edad" required>
                                 </div>
                             </div>
@@ -172,53 +176,52 @@ $numAsientos = count($asientoIds);
 
                         {{-- ----------------------------------------------------- --}}
                         {{-- Bloque de Datos del Comprador (Contacto) --}}
+                        {{-- (Ficha distinguida con borde ámbar) --}}
                         {{-- ----------------------------------------------------- --}}
-                        <div class="bg-white p-6 rounded-xl shadow-lg border border-gray-300">
-                            
-                            <h2 class="text-xl font-bold mb-4 pb-2 border-b text-amber-600">
+                        <div class="bg-white p-6 rounded-xl shadow-lg border-l-4 border-amber-500 transition duration-300 hover:shadow-xl">
+                            <h2 class="text-xl font-bold text-amber-600 mb-4 pb-2 border-b border-gray-200">
                                 Datos de Contacto (Comprador Principal)
                             </h2>
-
                             <p class="text-sm text-gray-600 mb-4">La confirmación de la reserva y los tickets se enviarán a este correo.</p>
                             
                             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                                 
                                 {{-- Correo Electrónico --}}
                                 <div>
-                                    <label for="comprador_email" class="block text-sm font-bold text-gray-700">Correo Electrónico</label>
+                                    <label for="comprador_email" class="block text-sm font-bold text-gray-700 mb-1">Correo Electrónico</label>
                                     <input type="email" id="comprador_email" name="comprador[email]" 
-                                           class="mt-1 block w-full py-2 px-3 border border-gray-300 rounded-md shadow-sm focus:ring-amber-500 focus:border-amber-500" 
+                                           class="w-full py-2 px-3 border border-gray-200 bg-white rounded-md shadow-inner focus:border-amber-500 focus:ring-amber-500 transition duration-150" 
                                            placeholder="correo@ejemplo.com" required>
                                 </div>
 
                                 {{-- Teléfono (Opcional, pero útil) --}}
                                 <div>
-                                    <label for="comprador_telefono" class="block text-sm font-medium text-gray-700">Teléfono (Opcional)</label>
+                                    <label for="comprador_telefono" class="block text-sm font-bold text-gray-700 mb-1">Teléfono (Opcional)</label>
                                     <input type="tel" id="comprador_telefono" name="comprador[telefono]" 
-                                           class="mt-1 block w-full py-2 px-3 border border-gray-300 rounded-md shadow-sm focus:ring-amber-500 focus:border-amber-500" 
+                                           class="w-full py-2 px-3 border border-gray-200 bg-white rounded-md shadow-inner focus:border-amber-500 focus:ring-amber-500 transition duration-150" 
                                            placeholder="9xxxxxxxxx">
                                 </div>
                                 
                                 {{-- Nombre del Comprador --}}
                                 <div>
-                                    <label for="comprador_nombre" class="block text-sm font-medium text-gray-700">Nombre Comprador</label>
+                                    <label for="comprador_nombre" class="block text-sm font-bold text-gray-700 mb-1">Nombre Comprador</label>
                                     <input type="text" id="comprador_nombre" name="comprador[nombre]" 
-                                           class="mt-1 block w-full py-2 px-3 border border-gray-300 rounded-md shadow-sm focus:ring-amber-500 focus:border-amber-500" 
+                                           class="w-full py-2 px-3 border border-gray-200 bg-white rounded-md shadow-inner focus:border-amber-500 focus:ring-amber-500 transition duration-150" 
                                            placeholder="Nombre" required>
                                 </div>
                                 
                                 {{-- DNI/RUC del Comprador --}}
                                 <div>
-                                    <label for="comprador_dni" class="block text-sm font-medium text-gray-700">DNI/RUC Comprador</label>
+                                    <label for="comprador_dni" class="block text-sm font-bold text-gray-700 mb-1">DNI/RUC Comprador</label>
                                     <input type="text" id="comprador_dni" name="comprador[dni]" 
-                                           class="mt-1 block w-full py-2 px-3 border border-gray-300 rounded-md shadow-sm focus:ring-amber-500 focus:border-amber-500" 
+                                           class="w-full py-2 px-3 border border-gray-200 bg-white rounded-md shadow-inner focus:border-amber-500 focus:ring-amber-500 transition duration-150" 
                                            placeholder="DNI/RUC" required>
                                 </div>
                             </div>
                         </div>
 
                         
-                        {{-- Botón Final del Formulario --}}
+                        {{-- Botón Final del Formulario (Centrado y con sombra profunda) --}}
                         <div class="mt-8">
                             <button type="submit" 
                                     class="w-full py-4 bg-gradient-to-r from-amber-500 to-orange-500 text-white font-extrabold text-lg rounded-lg transition duration-200 transform hover:scale-[1.01] shadow-xl hover:shadow-2xl">
@@ -229,25 +232,60 @@ $numAsientos = count($asientoIds);
                 </div>
 
 
-                {{-- Columna 3: Resumen de Reserva (Sticky) --}}
+                {{-- Columna 3: Resumen de Reserva (STICKY Y MEJORADO) --}}
                 <div class="lg:col-span-1 space-y-6 lg:sticky lg:top-8">
                     
-                    <div class="bg-white p-6 rounded-xl shadow-lg border border-gray-200">
-                        <h3 class="text-xl font-bold text-gray-900 border-b pb-3 mb-4">Tu Reserva ({{ $numAsientos }} Asiento{{ $numAsientos > 1 ? 's' : '' }})</h3>
+                    <div class="bg-white p-6 rounded-xl shadow-2xl border border-gray-100">
                         
-                        <div class="space-y-2 text-sm">
-                            <p><strong>Ruta:</strong> {{ $viaje->ruta->origen->nombre }} &rarr; {{ $viaje->ruta->destino->nombre }}</p>
-                            <p><strong>Empresa:</strong> {{ $viaje->empresa->nombre }}</p>
-                            <p><strong>Salida:</strong> {{ \Carbon\Carbon::parse($viaje->fecha_salida)->isoFormat('ddd, D MMM YYYY') }} a las {{ \Carbon\Carbon::parse($viaje->hora_salida)->format('h:i A') }}</p>
-                            <p><strong>Asientos:</strong> <span class="font-bold text-amber-600">{{ implode(', ', $asientosSeleccionados->toArray()) }}</span></p>
+                        {{-- Título con ícono --}}
+                        <div class="flex items-center mb-4 pb-3 border-b border-gray-200">
+                            <svg class="w-6 h-6 text-blue-600 mr-2" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+                                <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"/>
+                            </svg>
+                            <h3 class="text-xl font-bold text-gray-900">Detalles de tu Reserva</h3>
                         </div>
 
-                        <div class="border-t my-4"></div>
+                        {{-- Detalles del Viaje --}}
+                        <div class="space-y-3 text-sm pb-4 border-b border-gray-100">
+                            <p class="flex justify-between">
+                                <span class="text-gray-600">Ruta:</span>
+                                <span class="font-semibold">{{ $viaje->ruta->origen->nombre }} → {{ $viaje->ruta->destino->nombre }}</span>
+                            </p>
+                            <p class="flex justify-between">
+                                <span class="text-gray-600">Salida:</span>
+                                <span class="font-semibold">{{ \Carbon\Carbon::parse($viaje->fecha_salida)->isoFormat('D MMM') }} - {{ \Carbon\Carbon::parse($viaje->hora_salida)->format('h:i A') }}</span>
+                            </p>
+                            <p class="flex justify-between">
+                                <span class="text-gray-600">Empresa:</span>
+                                <span class="font-semibold">{{ $viaje->empresa->nombre }}</span>
+                            </p>
+                        </div>
 
-                        {{-- Total --}}
-                        <div class="flex justify-between items-center text-2xl font-bold">
-                            <span>Total a Pagar:</span>
-                            <span class="text-amber-600">S/ {{ number_format($total, 2) }}</span>
+                        {{-- Asientos Seleccionados (CORREGIDO PARA USAR EL DESGLOSE DE PRECIOS) --}}
+                        <div class="py-4 border-b border-gray-100">
+                            <p class="text-md font-bold text-gray-700 mb-2">Asientos ({{ $numAsientos }}):</p>
+                            <ul class="space-y-2"> {{-- Aumentamos el espaciado aquí --}}
+                                @foreach ($asientosResumen as $asientoDetalle)
+                                    <li class="flex justify-between text-sm items-center py-1 bg-gray-50 rounded px-2"> {{-- Fondo gris para resaltar cada ítem --}}
+                                        {{-- LADO IZQUIERDO: Número de Asiento y Adicional --}}
+                                        <span class="text-gray-700">
+                                            Asiento N° <strong class="text-amber-600">{{ $asientoDetalle['numero_asiento'] }}</strong>
+                                            @if($asientoDetalle['precio_adicional'] > 0)
+                                                <span class="text-amber-500 text-xs font-medium">(+ S/ {{ number_format($asientoDetalle['precio_adicional'], 2) }} extra)</span>
+                                            @endif
+                                        </span>
+                                        
+                                        {{-- LADO DERECHO: Precio Unitario --}}
+                                        <span class="font-bold text-gray-900">S/ {{ number_format($asientoDetalle['precio_unitario'], 2) }}</span>
+                                    </li>
+                                @endforeach
+                            </ul>
+                        </div>
+
+                        {{-- Precio Total --}}
+                        <div class="pt-4 flex justify-between items-center">
+                            <span class="text-2xl font-bold text-gray-900">TOTAL FINAL:</span>
+                            <span class="text-4xl font-extrabold text-amber-600">S/ {{ number_format($total, 2) }}</span>
                         </div>
                     </div>
                 </div>

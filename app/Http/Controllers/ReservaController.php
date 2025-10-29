@@ -50,28 +50,51 @@ class ReservaController extends Controller
                 return redirect()->back()->withErrors(['general' => 'Algunos asientos no son válidos para este viaje.']);
             }
 
+            // 4. Calcular el total y crear el desglose por asiento (¡LA CLAVE DE LA CORRECCIÓN!)
+            $total = 0;
+            $asientosDetallados = [];
+            $asientoSeleccionadosNumeros = [];
+
             foreach ($asientos as $asiento) {
                 if ($asiento->estado !== 'disponible') {
                     DB::rollBack();
                     return redirect()->back()->withErrors(['general' => "El asiento {$asiento->numero_asiento} acaba de ser ocupado. Por favor, intente de nuevo."]); 
                 }
+
+                // Cálculo del precio unitario (Base + Adicional)
+                $precioBase = $viaje->precio;
+                // Asumimos que el modelo Asiento tiene un campo 'precio_adicional'
+                $precioAdicional = $asiento->precio_adicional ?? 0; 
+                $precioUnitario = $precioBase + $precioAdicional;
+
+                $total += $precioUnitario;
+
+                $asientosDetallados[] = [
+                    'id' => $asiento->id,
+                    'numero_asiento' => $asiento->numero_asiento,
+                    'piso' => $asiento->piso,
+                    'precio_unitario' => $precioUnitario, // Precio ya sumado
+                    'precio_adicional' => $precioAdicional, // Costo extra para visual
+                ];
+                $asientoSeleccionadosNumeros[] = $asiento->numero_asiento;
             }
             
-            // 4. Calcular el total y guardar la información de bloqueo en la sesión
-            $total = $viaje->precio * count($asientos);
-
+            // 5. Guardar la información detallada en la sesión (¡CORREGIDO!)
             session(['reserva_temporal' => [
                 'viaje_id' => $viaje->id,
-                'asiento_ids' => $asientos->pluck('id')->toArray(),
+                'asiento_ids' => $asientos->pluck('id')->toArray(), // IDs para la siguiente validación
+                'asientos_detalles' => $asientosDetallados, // <--- ¡AÑADIDO!
                 'total' => $total,
             ]]);
             
-            // 5. Cargar datos para la vista de pasajeros (Paso 2)
+            // 6. Cargar datos para la vista de pasajeros (Paso 2)
             $viaje->load(['ruta.origen', 'ruta.destino', 'empresa']);
-            $asientosSeleccionados = $asientos->pluck('numero_asiento'); // Números para el título
+            $asientosSeleccionados = collect($asientoSeleccionadosNumeros); // Pasamos los números para el título
+            
+            $asientosResumen = $asientosDetallados; // <--- ¡AÑADIDO!
 
-            // 6. Retorna la nueva vista (el formulario de datos)
-            return view('reserva_pasajeros', compact('viaje', 'asientosSeleccionados', 'total'));
+            // 7. Retorna la nueva vista (el formulario de datos)
+            return view('reserva_pasajeros', compact('viaje', 'asientosSeleccionados', 'total', 'asientosResumen')); // <--- ¡CORREGIDO!
 
 
         } catch (\Exception $e) {
