@@ -9,17 +9,27 @@ return new class extends Migration
     /**
      * Run the migrations.
      */
-    
-    // database/migrations/xxxx_xx_xx_xxxxxx_create_reserva_asiento_table.php
-
     public function up(): void
     {
-        Schema::create('reserva_asiento', function (Blueprint $table) {
+        // El nombre de la tabla debe ser 'reserva_asientos' (plural) 
+        // para seguir la convención de Laravel con el modelo 'ReservaAsiento'.
+        Schema::create('reserva_asientos', function (Blueprint $table) {
+            $table->id(); // ¡Añadido! Es mejor tener un ID único.
+
             $table->foreignId('reserva_id')->constrained('reservas')->onDelete('cascade');
-            $table->foreignId('asiento_id')->constrained('asientos')->onDelete('cascade');
+            $table->foreignId('asiento_id')->constrained('asientos'); // No borres el asiento, solo la reserva
+            $table->foreignId('viaje_id')->constrained('viajes'); // ¡Añadido!
+
+            // ¡¡AQUÍ ESTÁN LOS DATOS DEL PASAJERO QUE FALTABAN!!
+            $table->decimal('precio', 8, 2);
+            $table->string('pasajero_nombre');
+            $table->string('pasajero_dni', 20);
+            $table->integer('pasajero_edad');
             
-            // Clave primaria compuesta
-            $table->primary(['reserva_id', 'asiento_id']);
+            $table->timestamps(); // ¡Añadido!
+
+            // Opcional: Clave única para evitar doble reserva del mismo asiento
+            $table->unique(['viaje_id', 'asiento_id']);
         });
     }
 
@@ -28,6 +38,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('reserva_asiento');
+        Schema::dropIfExists('reserva_asientos'); // Actualizado a plural
     }
 };

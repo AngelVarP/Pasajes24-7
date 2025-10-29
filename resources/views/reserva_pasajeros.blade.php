@@ -20,7 +20,7 @@ $asientosSeleccionados = $asientosSeleccionados ?? collect($asientosResumen)->pl
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     
-    <link rel="icon" href="{{ asset('images/p-favicon.png') }}" type="image/png">
+    <link rel="icon" href="{{ asset('images/logo-pasajes24-7.png') }}" type="image/png">
 
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 
@@ -43,17 +43,23 @@ $asientosSeleccionados = $asientosSeleccionados ?? collect($asientosResumen)->pl
              letter-spacing: -0.025em; /* Ligeramente más junto */
         }
         
+        /* Estilo para borde de input con error */
+        .input-error {
+            border-color: #ef4444; /* red-500 */
+            background-color: #fee2e2; /* red-100 */
+        }
     </style>
 </head>
 
 <body class="main-content-bg text-gray-800 flex flex-col min-h-screen">
 
-    {{-- Navbar con Barra de Progreso (Paso 3 Resaltado) --}}
+    {{-- Navbar (Igual que antes) --}}
     <header class="bg-white shadow-md sticky top-0 z-50">
+        {{-- ... (Todo el header queda igual) ... --}}
         <div class="container mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex justify-between items-center py-4">
                 <a href="{{ route('home') }}" class="transition duration-150">
-                    <img src="{{ asset('images/logo-pasajes24-7-3.png') }}" alt="Logo Pasajes24/7" class="h-[40px] w-auto">
+                    <img src="{{ asset('images/logo-pasajes24-7-2.png') }}" alt="Logo Pasajes24/7" class="h-[90px] w-auto">
                 </a>
                 <div class="space-x-4">
                     <a href="#" class="text-gray-600 hover:text-blue-600 text-sm font-medium">Mis Pasajes</a>
@@ -61,34 +67,26 @@ $asientosSeleccionados = $asientosSeleccionados ?? collect($asientosResumen)->pl
                 </div>
             </div>
         </div>
-        
         <div class="border-t border-gray-200">
             <div class="container mx-auto px-4 sm:px-6 lg:px-8 py-3">
                 <nav class="flex items-center justify-between" aria-label="Progress">
                     
                     <div class="flex items-center text-blue-600 font-semibold">
-                        <svg class="w-5 h-5 mr-2" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
-                            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
-                        </svg>
+                        <svg class="w-5 h-5 mr-2" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" /></svg>
                         <span class="text-sm">1. Búsqueda</span>
                     </div>
 
                     <div class="flex-1 h-0.5 bg-blue-600 mx-4" aria-hidden="true"></div>
 
                     <div class="flex items-center text-blue-600 font-semibold">
-                        <svg class="w-5 h-5 mr-2" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
-                            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
-                        </svg>
+                        <svg class="w-5 h-5 mr-2" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" /></svg>
                         <span class="text-sm">2. Asientos</span>
                     </div>
 
                     <div class="flex-1 h-0.5 bg-amber-600 mx-4" aria-hidden="true"></div>
                     
                     <div class="flex items-center text-amber-600 font-bold">
-                        <span class="relative flex h-5 w-5 items-center justify-center mr-2">
-                            <span class="absolute inline-flex h-full w-full animate-ping rounded-full bg-amber-400 opacity-75"></span>
-                            <span class="relative inline-flex rounded-full h-3 w-3 bg-amber-500"></span>
-                        </span>
+                        <span class="relative flex h-5 w-5 items-center justify-center mr-2"><span class="absolute inline-flex h-full w-full animate-ping rounded-full bg-amber-400 opacity-75"></span><span class="relative inline-flex rounded-full h-3 w-3 bg-amber-500"></span></span>
                         <span class="text-sm">3. Pago</span>
                     </div>
                 </nav>
@@ -109,6 +107,18 @@ $asientosSeleccionados = $asientosSeleccionados ?? collect($asientosResumen)->pl
                 </h1>
                 <p class="text-gray-600 mt-2">Completa la información de los **{{ $numAsientos }} pasajeros** y los datos de contacto para continuar con el pago.</p>
             </div>
+            
+            {{-- BLOQUE DE ERRORES DE VALIDACIÓN --}}
+            @if ($errors->any())
+                <div class="bg-red-100 border-l-4 border-red-500 text-red-700 p-4 mb-6 rounded-lg shadow-md" role="alert">
+                    <h3 class="font-bold text-lg mb-2">¡Ups! Hay errores en el formulario:</h3>
+                    <ul class="list-disc list-inside space-y-1 text-sm">
+                        @foreach ($errors->all() as $error)
+                            <li>{{ $error }}</li>
+                        @endforeach
+                    </ul>
+                </div>
+            @endif
 
 
             {{-- Contenedor Principal: Formulario y Resumen --}}
@@ -118,19 +128,15 @@ $asientosSeleccionados = $asientosSeleccionados ?? collect($asientosResumen)->pl
                 <div class="lg:col-span-2">
                     <form action="{{ route('reservas.procesar_pasajeros') }}" method="POST" class="space-y-6">
                         @csrf
-                        {{-- Datos de la reserva (enviados de nuevo para validación) --}}
-                        <input type="hidden" name="viaje_id" value="{{ $viaje->id }}">
                         
-                        {{-- IDs de asientos (pasamos los IDs de vuelta, ya validados) --}}
-                        @foreach ($reservaData['asiento_ids'] ?? [] as $index => $asiento_id)
-                            <input type="hidden" name="asiento_ids[]" value="{{ $asiento_id }}">
-                        @endforeach
+                        {{-- ======================================================= --}}
+                        {{-- ¡CAMBIO! CAMPOS OCULTOS REDUNDANTES ELIMINADOS --}}
+                        {{-- Ya no enviamos viaje_id ni asiento_ids[] --}}
+                        {{-- El controlador los obtendrá de la sesión --}}
+                        {{-- ======================================================= --}}
                         
                         
-                        {{-- ----------------------------------------------------- --}}
                         {{-- Bloque de Datos de los Pasajeros (Dinámico por Asiento) --}}
-                        {{-- (Fichas con borde azul) --}}
-                        {{-- ----------------------------------------------------- --}}
                         @foreach ($asientosSeleccionados as $index => $numero_asiento)
                         <div class="bg-white p-6 rounded-xl shadow-lg border-l-4 border-blue-600 transition duration-300 hover:shadow-xl">
                             <h2 class="text-xl font-bold text-gray-900 mb-4 pb-2 border-b border-gray-200">
@@ -142,42 +148,51 @@ $asientosSeleccionados = $asientosSeleccionados ?? collect($asientosResumen)->pl
                                 <div>
                                     <label for="nombre_{{ $index }}" class="block text-sm font-bold text-gray-700 mb-1">Nombre</label>
                                     <input type="text" id="nombre_{{ $index }}" name="pasajeros[{{ $index }}][nombre]" 
-                                           class="w-full py-2 px-3 border border-gray-200 bg-white rounded-md shadow-inner focus:border-amber-500 focus:ring-amber-500 transition duration-150" 
-                                           placeholder="Nombre" required>
+                                           class="w-full py-2 px-3 border border-gray-200 bg-white rounded-md shadow-inner focus:border-amber-500 focus:ring-amber-500 transition duration-150 @error('pasajeros.' . $index . '.nombre') input-error @enderror" 
+                                           placeholder="Nombre" value="{{ old('pasajeros.' . $index . '.nombre') }}" required>
+                                    @error('pasajeros.' . $index . '.nombre')
+                                        <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
+                                    @enderror
                                 </div>
                                 
                                 {{-- Apellido --}}
                                 <div>
                                     <label for="apellido_{{ $index }}" class="block text-sm font-bold text-gray-700 mb-1">Apellido</label>
                                     <input type="text" id="apellido_{{ $index }}" name="pasajeros[{{ $index }}][apellido]" 
-                                           class="w-full py-2 px-3 border border-gray-200 bg-white rounded-md shadow-inner focus:border-amber-500 focus:ring-amber-500 transition duration-150" 
-                                           placeholder="Apellido" required>
+                                           class="w-full py-2 px-3 border border-gray-200 bg-white rounded-md shadow-inner focus:border-amber-500 focus:ring-amber-500 transition duration-150 @error('pasajeros.' . $index . '.apellido') input-error @enderror" 
+                                           placeholder="Apellido" value="{{ old('pasajeros.' . $index . '.apellido') }}" required>
+                                    @error('pasajeros.' . $index . '.apellido')
+                                        <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
+                                    @enderror
                                 </div>
                                 
                                 {{-- DNI --}}
                                 <div>
                                     <label for="dni_{{ $index }}" class="block text-sm font-bold text-gray-700 mb-1">DNI</label>
                                     <input type="text" id="dni_{{ $index }}" name="pasajeros[{{ $index }}][dni]" 
-                                           class="w-full py-2 px-3 border border-gray-200 bg-white rounded-md shadow-inner focus:border-amber-500 focus:ring-amber-500 transition duration-150" 
-                                           placeholder="DNI" required>
+                                           class="w-full py-2 px-3 border border-gray-200 bg-white rounded-md shadow-inner focus:border-amber-500 focus:ring-amber-500 transition duration-150 @error('pasajeros.' . $index . '.dni') input-error @enderror" 
+                                           placeholder="DNI (8 dígitos)" value="{{ old('pasajeros.' . $index . '.dni') }}" required>
+                                    @error('pasajeros.' . $index . '.dni')
+                                        <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
+                                    @enderror
                                 </div>
 
                                 {{-- Edad --}}
                                 <div>
                                     <label for="edad_{{ $index }}" class="block text-sm font-bold text-gray-700 mb-1">Edad</label>
                                     <input type="number" min="1" max="120" id="edad_{{ $index }}" name="pasajeros[{{ $index }}][edad]" 
-                                           class="w-full py-2 px-3 border border-gray-200 bg-white rounded-md shadow-inner focus:border-amber-500 focus:ring-amber-500 transition duration-150" 
-                                           placeholder="Edad" required>
+                                           class="w-full py-2 px-3 border border-gray-200 bg-white rounded-md shadow-inner focus:border-amber-500 focus:ring-amber-500 transition duration-150 @error('pasajeros.' . $index . '.edad') input-error @enderror" 
+                                           placeholder="Edad" value="{{ old('pasajeros.' . $index . '.edad') }}" required>
+                                    @error('pasajeros.' . $index . '.edad')
+                                        <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
+                                    @enderror
                                 </div>
                             </div>
                         </div>
                         @endforeach
 
 
-                        {{-- ----------------------------------------------------- --}}
                         {{-- Bloque de Datos del Comprador (Contacto) --}}
-                        {{-- (Ficha distinguida con borde ámbar) --}}
-                        {{-- ----------------------------------------------------- --}}
                         <div class="bg-white p-6 rounded-xl shadow-lg border-l-4 border-amber-500 transition duration-300 hover:shadow-xl">
                             <h2 class="text-xl font-bold text-amber-600 mb-4 pb-2 border-b border-gray-200">
                                 Datos de Contacto (Comprador Principal)
@@ -190,38 +205,50 @@ $asientosSeleccionados = $asientosSeleccionados ?? collect($asientosResumen)->pl
                                 <div>
                                     <label for="comprador_email" class="block text-sm font-bold text-gray-700 mb-1">Correo Electrónico</label>
                                     <input type="email" id="comprador_email" name="comprador[email]" 
-                                           class="w-full py-2 px-3 border border-gray-200 bg-white rounded-md shadow-inner focus:border-amber-500 focus:ring-amber-500 transition duration-150" 
-                                           placeholder="correo@ejemplo.com" required>
+                                           class="w-full py-2 px-3 border border-gray-200 bg-white rounded-md shadow-inner focus:border-amber-500 focus:ring-amber-500 transition duration-150 @error('comprador.email') input-error @enderror" 
+                                           placeholder="correo@ejemplo.com" value="{{ old('comprador.email') }}" required>
+                                    @error('comprador.email')
+                                        <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
+                                    @enderror
                                 </div>
 
                                 {{-- Teléfono (Opcional, pero útil) --}}
                                 <div>
                                     <label for="comprador_telefono" class="block text-sm font-bold text-gray-700 mb-1">Teléfono (Opcional)</label>
                                     <input type="tel" id="comprador_telefono" name="comprador[telefono]" 
-                                           class="w-full py-2 px-3 border border-gray-200 bg-white rounded-md shadow-inner focus:border-amber-500 focus:ring-amber-500 transition duration-150" 
-                                           placeholder="9xxxxxxxxx">
+                                           class="w-full py-2 px-3 border border-gray-200 bg-white rounded-md shadow-inner focus:border-amber-500 focus:ring-amber-500 transition duration-150 @error('comprador.telefono') input-error @enderror" 
+                                           placeholder="9xxxxxxxxx" value="{{ old('comprador.telefono') }}">
+                                    @error('comprador.telefono')
+                                        <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
+                                    @enderror
                                 </div>
                                 
                                 {{-- Nombre del Comprador --}}
                                 <div>
                                     <label for="comprador_nombre" class="block text-sm font-bold text-gray-700 mb-1">Nombre Comprador</label>
                                     <input type="text" id="comprador_nombre" name="comprador[nombre]" 
-                                           class="w-full py-2 px-3 border border-gray-200 bg-white rounded-md shadow-inner focus:border-amber-500 focus:ring-amber-500 transition duration-150" 
-                                           placeholder="Nombre" required>
+                                           class="w-full py-2 px-3 border border-gray-200 bg-white rounded-md shadow-inner focus:border-amber-500 focus:ring-amber-500 transition duration-150 @error('comprador.nombre') input-error @enderror" 
+                                           placeholder="Nombre" value="{{ old('comprador.nombre') }}" required>
+                                    @error('comprador.nombre')
+                                        <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
+                                    @enderror
                                 </div>
                                 
                                 {{-- DNI/RUC del Comprador --}}
                                 <div>
                                     <label for="comprador_dni" class="block text-sm font-bold text-gray-700 mb-1">DNI/RUC Comprador</label>
                                     <input type="text" id="comprador_dni" name="comprador[dni]" 
-                                           class="w-full py-2 px-3 border border-gray-200 bg-white rounded-md shadow-inner focus:border-amber-500 focus:ring-amber-500 transition duration-150" 
-                                           placeholder="DNI/RUC" required>
+                                           class="w-full py-2 px-3 border border-gray-200 bg-white rounded-md shadow-inner focus:border-amber-500 focus:ring-amber-500 transition duration-150 @error('comprador.dni') input-error @enderror" 
+                                           placeholder="DNI/RUC" value="{{ old('comprador.dni') }}" required>
+                                    @error('comprador.dni')
+                                        <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
+                                    @enderror
                                 </div>
                             </div>
                         </div>
 
                         
-                        {{-- Botón Final del Formulario (Centrado y con sombra profunda) --}}
+                        {{-- Botón Final del Formulario --}}
                         <div class="mt-8">
                             <button type="submit" 
                                     class="w-full py-4 bg-gradient-to-r from-amber-500 to-orange-500 text-white font-extrabold text-lg rounded-lg transition duration-200 transform hover:scale-[1.01] shadow-xl hover:shadow-2xl">
@@ -239,9 +266,7 @@ $asientosSeleccionados = $asientosSeleccionados ?? collect($asientosResumen)->pl
                         
                         {{-- Título con ícono --}}
                         <div class="flex items-center mb-4 pb-3 border-b border-gray-200">
-                            <svg class="w-6 h-6 text-blue-600 mr-2" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
-                                <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"/>
-                            </svg>
+                            <svg class="w-6 h-6 text-blue-600 mr-2" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"/></svg>
                             <h3 class="text-xl font-bold text-gray-900">Detalles de tu Reserva</h3>
                         </div>
 
@@ -261,21 +286,18 @@ $asientosSeleccionados = $asientosSeleccionados ?? collect($asientosResumen)->pl
                             </p>
                         </div>
 
-                        {{-- Asientos Seleccionados (CORREGIDO PARA USAR EL DESGLOSE DE PRECIOS) --}}
+                        {{-- Asientos Seleccionados --}}
                         <div class="py-4 border-b border-gray-100">
                             <p class="text-md font-bold text-gray-700 mb-2">Asientos ({{ $numAsientos }}):</p>
-                            <ul class="space-y-2"> {{-- Aumentamos el espaciado aquí --}}
+                            <ul class="space-y-2">
                                 @foreach ($asientosResumen as $asientoDetalle)
-                                    <li class="flex justify-between text-sm items-center py-1 bg-gray-50 rounded px-2"> {{-- Fondo gris para resaltar cada ítem --}}
-                                        {{-- LADO IZQUIERDO: Número de Asiento y Adicional --}}
+                                    <li class="flex justify-between text-sm items-center py-1 bg-gray-50 rounded px-2">
                                         <span class="text-gray-700">
                                             Asiento N° <strong class="text-amber-600">{{ $asientoDetalle['numero_asiento'] }}</strong>
                                             @if($asientoDetalle['precio_adicional'] > 0)
                                                 <span class="text-amber-500 text-xs font-medium">(+ S/ {{ number_format($asientoDetalle['precio_adicional'], 2) }} extra)</span>
                                             @endif
                                         </span>
-                                        
-                                        {{-- LADO DERECHO: Precio Unitario --}}
                                         <span class="font-bold text-gray-900">S/ {{ number_format($asientoDetalle['precio_unitario'], 2) }}</span>
                                     </li>
                                 @endforeach
@@ -294,7 +316,7 @@ $asientosSeleccionados = $asientosSeleccionados ?? collect($asientosResumen)->pl
         </div>
     </main>
 
-    {{-- Footer (Estilo 'resultados.blade.php') --}}
+    {{-- Footer --}}
     <footer class="bg-gray-800 text-white py-8 mt-12">
         <div class="container mx-auto px-4 text-center">
             <p>&copy; {{ date('Y') }} Pasajes24/7. Todos los derechos reservados.</p>

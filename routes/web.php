@@ -18,12 +18,19 @@ Route::post('/buscar', [BusquedaController::class, 'buscar'])->name('viajes.busc
 // Ruta para MOSTRAR la selección de asientos
 Route::get('/viajes/{viaje}/asientos', [BusquedaController::class, 'mostrarAsientos'])->name('viajes.asientos');
 
-// Ruta para PROCESAR la selección (la que usa el formulario)
-Route::post('/reservar/store', [ReservaController::class, 'store'])->name('reservas.store');
+Route::post('/reservar/store', [App\Http\Controllers\ReservaController::class, 'store'])
+     ->name('reservas.store');
 
-// Paso 3 (POST): Recibe datos de pasajeros, valida, guarda en sesión y procede al pago
-Route::post('/reservar/procesar-pasajeros', [ReservaController::class, 'procesarPasajeros'])->name('reservas.procesar_pasajeros'); // <-- NUEVA RUTA
+// PASO 2 (NUEVA RUTA GET): Mostrar el formulario de pasajeros
+Route::get('/reservar/ingresar-datos', [App\Http\Controllers\ReservaController::class, 'mostrarPasajeros'])
+     ->name('reservas.mostrar_pasajeros');
 
+Route::post('/reservar/procesar-pasajeros', [App\Http\Controllers\ReservaController::class, 'procesarPasajeros'])
+     ->name('reservas.procesar_pasajeros'); // <-- Coincide con reserva_pasajeros.blade.php
+
+// Paso 3: Página de éxito/confirmación
+Route::get('/reservar/confirmacion/{reserva}', [App\Http\Controllers\ReservaController::class, 'confirmacion'])
+     ->name('reserva.confirmacion');
 // ---------------------------------
 
 

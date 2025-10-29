@@ -24,10 +24,10 @@ return new class extends Migration
             $table->string('estado')->default('pendiente_pago'); // "pendiente_pago", "pagado", "cancelado"
             
             // Información del pasajero principal (quien compra)
-            $table->string('nombre_pasajero');
-            $table->string('dni_pasajero', 20);
-            $table->string('email_pasajero');
-            $table->string('telefono_pasajero')->nullable();
+            $table->string('nombre_comprador');
+            $table->string('dni_comprador', 20);
+            $table->string('email_comprador');
+            $table->string('telefono_comprador')->nullable();
 
             $table->timestamps();
         });

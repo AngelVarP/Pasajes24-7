@@ -9,27 +9,48 @@ class Reserva extends Model
 {
     use HasFactory;
 
-    protected $table = 'reservas';
+    /**
+     * Campos que se pueden asignar masivamente.
+     */
     protected $fillable = [
-        'viaje_id', 'user_id', 'codigo_reserva', 'monto_total', 'estado',
-        'nombre_pasajero', 'dni_pasajero', 'email_pasajero', 'telefono_pasajero'
+        'viaje_id',
+        'user_id',
+        'codigo_reserva',
+        'nombre_comprador',
+        'dni_comprador',
+        'email_comprador',
+        'telefono_comprador',
+        'monto_total',
+        'estado',
     ];
 
-    // Relación: Una reserva pertenece a un viaje
+    // =======================================================
+    // ¡¡ESTAS SON LAS RELACIONES QUE FALTAN!!
+    // =======================================================
+
+    /**
+     * Obtiene el viaje asociado a la reserva.
+     */
     public function viaje()
     {
-        return $this->belongsTo(Viaje::class, 'viaje_id');
+        return $this->belongsTo(Viaje::class);
     }
 
-    // Relación: Una reserva pertenece a un usuario (si está logueado)
+    /**
+     * Obtiene el usuario (si existe) que hizo la reserva.
+     */
     public function user()
     {
-        return $this->belongsTo(User::class, 'user_id');
+        return $this->belongsTo(User::class);
     }
 
-    // Relación con asientos (muchos a muchos a través de la tabla pivote)
-    public function asientos()
+    /**
+     * ¡¡ESTA ES LA FUNCIÓN QUE CAUSA EL ERROR!!
+     * Obtiene los asientos/pasajeros asociados a esta reserva.
+     */
+    public function reservaAsientos()
     {
-        return $this->belongsToMany(Asiento::class, 'reserva_asiento', 'reserva_id', 'asiento_id');
+        // Esta función debe ser plural 'reservaAsientos'
+        return $this->hasMany(ReservaAsiento::class);
     }
 }
