@@ -87,8 +87,10 @@
                         <div class="w-full md:w-1/4 p-5 text-center">
                             <p class="text-3xl font-extrabold text-gray-800">S/ {{ number_format($viaje->precio, 2) }}</p>
                             <span class="text-sm text-gray-500 mb-3 block">{{ $viaje->asientos_disponibles }} asientos disponibles</span>
-                            {{-- Este enlace llevará a la selección de asientos --}}
-                            <a href="{{-- route('viajes.asientos', $viaje->id) --}}" class="w-full inline-block bg-gradient-to-r from-amber-500 to-orange-500 text-white font-semibold py-2 px-6 rounded-lg shadow-md hover:from-amber-600 hover:to-orange-600 transition duration-300 transform hover:scale-105">
+
+                            {{-- Dentro del bucle @forelse ($viajes as $viaje) en resultados.blade.php --}}
+                            <a href="{{ route('viajes.asientos', $viaje) }}" {{-- ¡ASEGÚRATE DE QUE ESTÉ ASÍ! --}}
+                            class="w-full inline-block bg-gradient-to-r from-amber-500 to-orange-500 text-white font-semibold py-2 px-6 rounded-lg shadow-md hover:from-amber-600 hover:to-orange-600 transition duration-300 transform hover:scale-105">
                                 Ver Asientos
                             </a>
                         </div>

@@ -66,4 +66,43 @@ class BusquedaController extends Controller
             'fecha' => $request->fecha,
         ]);
     }
+
+        /**
+     * Muestra la página de selección de asientos para un viaje específico.
+     *
+     * @param  \App\Models\Viaje  $viaje  Laravel inyecta el Viaje basado en el {viaje} de la URL
+     * @return \Illuminate\View\View|\Illuminate\Http\RedirectResponse
+     */
+    /**
+     * Muestra la página de selección de asientos para un viaje específico.
+     *
+     * @param  \App\Models\Viaje  $viaje
+     * @return \Illuminate\View\View
+     */
+    public function mostrarAsientos(Viaje $viaje)
+    {
+        // Cargar las relaciones necesarias para mostrar los detalles del viaje
+        $viaje->load(['ruta.origen', 'ruta.destino', 'empresa']);
+
+        // Cargar los asientos de este viaje.
+        // La vista 'asientos.blade.php' se encargará de la posición
+        // (Esto asume que ya ejecutaste la migración y el seeder de la Alternativa 2)
+        $asientos = $viaje->asientos; 
+
+        // Devolvemos la vista 'asientos' con toda la información
+        return view('asientos', compact('viaje', 'asientos'));
+    }
+    // --------------------------------------------------
+
+
+
+
+
+
+
+
+
+
+
+
 }
