@@ -252,7 +252,7 @@ $asientosSeleccionados = $asientosSeleccionados ?? collect($asientosResumen)->pl
                         <div class="mt-8">
                             <button type="submit" 
                                     class="w-full py-4 bg-gradient-to-r from-amber-500 to-orange-500 text-white font-extrabold text-lg rounded-lg transition duration-200 transform hover:scale-[1.01] shadow-xl hover:shadow-2xl">
-                                Continuar a la Pasarela de Pago (S/ {{ number_format($total, 2) }})
+                                Confirmar pago (S/ {{ number_format($total, 2) }})
                             </button>
                         </div>
                     </form>

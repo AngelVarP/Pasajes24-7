@@ -224,6 +224,14 @@ class ReservaController extends Controller
             Asiento::whereIn('id', $reservaTemporal['asiento_ids'])
                    ->update(['estado' => 'ocupado']);
 
+
+            $viaje = Viaje::find($reservaTemporal['viaje_id']);
+
+            if ($viaje) {
+                $viaje->decrement('asientos_disponibles', count($reservaTemporal['asiento_ids']));
+            }
+
+
             // 9. Confirmar transacción
             DB::commit();
 
