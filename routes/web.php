@@ -10,6 +10,7 @@ use App\Http\Controllers\ReservaController;
 use App\Http\Controllers\RutaAdminController; // <-- Importante
 use App\Http\Controllers\CiudadAdminController; // <-- Importante
 use App\Http\Controllers\ReservaAdminController;
+use App\Http\Controllers\EmpresaAdminController;
 
 // Ruta principal (Homepage) AHORA SÍ TIENE NOMBRE
 Route::get('/', [HomeController::class, 'index'])->name('home'); 
@@ -68,6 +69,8 @@ Route::prefix('admin')
 
      // Rutas de Reporte de Reservas (NUEVA RUTA)
     Route::get('/reservas', [ReservaAdminController::class, 'index'])->name('reservas.index');
+
+    Route::resource('empresas', EmpresaAdminController::class)->except(['show']);
 
 
 
