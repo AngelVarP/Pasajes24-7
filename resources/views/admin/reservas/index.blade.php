@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Gestionar Ciudades - Admin</title>
+<title>Reporte de Reservas - Admin</title>
 
 {{-- Estilos --}}
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -13,13 +13,14 @@
 @vite(['resources/css/app.css', 'resources/js/app.js'])
 <style>
 body { font-family: 'Inter', sans-serif; }
-.admin-sidebar { background-color: #111827; }
+.admin-sidebar { background-color: #111827; } 
 .admin-sidebar a { transition: all 0.2s ease-in-out; }
-.admin-sidebar a:hover, .admin-sidebar a.active { background-color: #374151; color: #f59e0b; }
-.admin-sidebar a.active { border-left: 4px solid #f59e0b; padding-left: calc(1rem - 4px); font-weight: 600; }
+.admin-sidebar a:hover, .admin-sidebar a.active { background-color: #374151; color: #f59e0b; } 
+.admin-sidebar a.active { border-left: 4px solid #f59e0b; padding-left: calc(1rem - 4px); font-weight: 600; } 
 .main-content-bg { background: linear-gradient(180deg, #f0f9ff 0%, #e0f2fe 100%); }
 .header-title { background: linear-gradient(to right, #f59e0b, #f97316); -webkit-background-clip: text; background-clip: text; color: transparent; font-weight: 800; letter-spacing: -0.025em; }
 input:focus, select:focus, button:focus-visible { outline: none; box-shadow: 0 0 0 3px rgba(245, 158, 11, 0.4); border-color: #f59e0b !important; }
+.table-cell-fixed { width: 100px; } /* Mantener estilos consistentes */
 </style>
 </head>
 <body class="bg-gray-100 text-gray-800">
@@ -47,11 +48,14 @@ input:focus, select:focus, button:focus-visible { outline: none; box-shadow: 0 0
 <svg class="w-5 h-5 mr-3 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
 <span>Gestionar Rutas</span>
 </a>
-<a href="#" class="flex items-center px-4 py-2.5 rounded-lg text-sm font-medium hover:bg-gray-700 hover:text-amber-500"><svg class="w-5 h-5 mr-3 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path></svg><span>Gestionar Empresas</span></a>
-<a href="{{ route('admin.ciudades.index') }}" class="active flex items-center px-4 py-2.5 rounded-lg text-sm font-medium"> {{-- ESTE ES EL ENLACE ACTIVO --}}
+{{-- Asumiendo la ruta 'admin.empresas.index' --}}
+<a href="#" class="flex items-center px-4 py-2.5 rounded-lg text-sm font-medium hover:bg-gray-700 hover:text-amber-500 {{ request()->routeIs('admin.empresas.index') ? 'active' : '' }}"><svg class="w-5 h-5 mr-3 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path></svg><span>Gestionar Empresas</span></a>
+<a href="{{ route('admin.ciudades.index') }}" class="flex items-center px-4 py-2.5 rounded-lg text-sm font-medium hover:bg-gray-700 hover:text-amber-500 {{ request()->routeIs('admin.ciudades.index') ? 'active' : '' }}">
 <svg class="w-5 h-5 mr-3 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.09M19.945 11H19a2 2 0 00-2 2v1a2 2 0 01-2 2 2 2 0 00-2 2v2.945M16 3.935V5.5A2.5 2.5 0 0113.5 8h-.09M12 21v-2.055A2.5 2.5 0 0114.5 16h-.09M12 3c-1.355 0-2.67.291-3.838.813a10.98 10.98 0 00-6.817 6.817C.791 11.33 0 12.645 0 14c0 1.355.791 2.67 1.345 3.838a10.98 10.98 0 006.817 6.817C9.33 24.209 10.645 25 12 25c1.355 0 2.67-.791 3.838-1.345a10.98 10.98 0 006.817-6.817C23.209 16.67 24 15.355 24 14c0-1.355-.791-2.67-1.345-3.838a10.98 10.98 0 00-6.817-6.817C14.67 2.791 13.355 2 12 2z"></path></svg><span>Gestionar Ciudades</span>
 </a>
-<a href="{{ route('admin.reservas.index') }}" class="flex items-center px-4 py-2.5 rounded-lg text-sm font-medium hover:bg-gray-700 hover:text-amber-500"><svg class="w-5 h-5 mr-3 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg><span>Ver Reservas</span></a>
+<a href="{{ route('admin.reservas.index') }}" class="active flex items-center px-4 py-2.5 rounded-lg text-sm font-medium">
+<svg class="w-5 h-5 mr-3 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg><span>Ver Reservas</span>
+</a>
 </nav>
 {{-- Logout --}}
 <div class="mt-auto p-4 border-t border-gray-700">
@@ -66,7 +70,7 @@ input:focus, select:focus, button:focus-visible { outline: none; box-shadow: 0 0
 <header class="bg-white shadow-sm h-16 flex items-center justify-between px-6 border-b border-gray-200">
 <div class="flex items-center">
 <button class="md:hidden mr-4 text-gray-500 hover:text-gray-700"><svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path></svg></button>
-<h1 class="header-title text-2xl font-extrabold tracking-tight">Gestionar Ciudades</h1>
+<h1 class="header-title text-2xl font-extrabold tracking-tight">Reporte de Reservas</h1>
 </div>
 <div class="flex items-center space-x-4">
 <span class="text-sm text-gray-600">Hola, {{ Auth::user()->name ?? 'Admin' }}</span>
@@ -76,18 +80,13 @@ input:focus, select:focus, button:focus-visible { outline: none; box-shadow: 0 0
 {{-- Área de Contenido Principal del Listado --}}
 <main class="flex-grow p-6 lg:p-10 main-content-bg">
 
-{{-- Encabezado y Botón Crear --}}
+{{-- Encabezado sin botón Crear (Reporte) --}}
 <div class="flex justify-between items-center mb-8 border-b pb-4 border-gray-300">
 <h2 class="text-2xl font-bold text-gray-800 flex items-center">
-<svg class="w-6 h-6 mr-3 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.09M19.945 11H19a2 2 0 00-2 2v1a2 2 0 01-2 2 2 2 0 00-2 2v2.945M16 3.935V5.5A2.5 2.5 0 0113.5 8h-.09M12 21v-2.055A2.5 2.5 0 0114.5 16h-.09M12 3c-1.355 0-2.67.291-3.838.813a10.98 10.98 0 00-6.817 6.817C.791 11.33 0 12.645 0 14c0 1.355.791 2.67 1.345 3.838a10.98 10.98 0 006.817 6.817C9.33 24.209 10.645 25 12 25c1.355 0 2.67-.791 3.838-1.345a10.98 10.98 0 006.817-6.817C23.209 16.67 24 15.355 24 14c0-1.355-.791-2.67-1.345-3.838a10.98 10.98 0 00-6.817-6.817C14.67 2.791 13.355 2 12 2z"></path></svg>
-Listado de Ciudades Registradas
+<svg class="w-6 h-6 mr-3 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17v2m-1-8h2m-1 0V8m-1 4h2m-1 0h-2m-1-4h2m-1 0V8m8 0a2 2 0 012 2v10a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V17"></path></svg>
+Listado de Reservas Registradas
 </h2>
-
-<a href="{{ route('admin.ciudades.create') }}"
-class="bg-gradient-to-r from-amber-500 to-orange-500 text-white font-bold py-2 px-4 rounded-lg shadow-md hover:shadow-lg hover:from-amber-600 hover:to-orange-600 transition duration-200 transform hover:-translate-y-0.5 flex items-center text-sm">
-<svg class="w-5 h-5 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
-Añadir Nueva Ciudad
-</a>
+{{-- Se quitó el botón Crear, ya que es una vista de reporte --}}
 </div>
 
 {{-- Mensajes de Éxito/Error --}}
@@ -107,37 +106,65 @@ Añadir Nueva Ciudad
 <table class="min-w-full divide-y divide-gray-200">
 <thead>
 <tr>
-<th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-1/12">ID</th>
-<th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-4/12">Nombre de la Ciudad</th>
-<th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-4/12">Departamento</th> {{-- AÑADIDO --}}
-<th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-3/12">Acciones</th>
+<th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-1/12">Código</th>
+<th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-3/12">Viaje / Ruta</th>
+<th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-2/12">Comprador</th>
+<th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-2/12">Asientos / Pasajeros</th>
+<th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider w-1/12">Monto</th>
+<th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-2/12">Fecha Reserva</th>
+<th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-1/12">Estado</th>
 </tr>
 </thead>
 <tbody class="bg-white divide-y divide-gray-200">
-@forelse ($ciudades as $ciudad)
+@forelse ($reservas as $reserva)
 <tr>
-<td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{{ $ciudad->id }}</td>
-<td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ $ciudad->nombre }}</td>
-<td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ $ciudad->departamento }}</td> {{-- AÑADIDO --}}
-<td class="px-6 py-4 whitespace-nowrap text-sm font-medium space-x-3">
-<a href="{{ route('admin.ciudades.edit', $ciudad) }}"
-class="text-indigo-600 hover:text-indigo-900 transition duration-150 ease-in-out">
-Editar
-</a>
-
-<form action="{{ route('admin.ciudades.destroy', $ciudad) }}" method="POST" class="inline-block" onsubmit="return confirm('¿Estás seguro de que quieres eliminar la ciudad: {{ addslashes($ciudad->nombre ?? 'N/A') }}?\n\n¡Si está asociada a una ruta, NO podrás eliminarla!');">
-@csrf
-@method('DELETE')
-<button type="submit"
-class="text-red-600 hover:text-red-900 transition duration-150 ease-in-out focus:outline-none bg-transparent border-none p-0 cursor-pointer">
-Eliminar
-</button>
-</form>
+<td class="px-6 py-4 whitespace-nowrap text-sm font-bold text-indigo-600">{{ $reserva->codigo_reserva }}</td>
+<td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+    <span class="font-medium">{{ $reserva->viaje->ruta->origen->nombre }} &rarr; {{ $reserva->viaje->ruta->destino->nombre }}</span>
+    <div class="text-xs text-gray-500 mt-1">
+        {{ $reserva->viaje->fecha_salida }} a las {{ \Carbon\Carbon::parse($reserva->viaje->hora_salida)->format('H:i') }} | {{ $reserva->viaje->empresa->nombre }}
+    </div>
+</td>
+<td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+    {{ $reserva->nombre_comprador }}
+    <div class="text-xs text-gray-500">{{ $reserva->email_comprador }}</div>
+</td>
+<td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+    @php
+        // Extrae y une los números de asiento de la relación N:M
+        $asientos = $reserva->reservaAsientos->map(fn($ra) => $ra->asiento->numero)->implode(', ');
+    @endphp
+    <span class="font-medium">{{ $reserva->reservaAsientos->count() }} asiento(s)</span>
+    <div class="text-xs text-gray-500">Asientos: {{ $asientos }}</div>
+</td>
+<td class="px-6 py-4 whitespace-nowrap text-sm font-bold text-green-600 text-right">
+    S/ {{ number_format($reserva->monto_total, 2) }}
+</td>
+<td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+    {{ $reserva->created_at->format('d/m/Y H:i') }}
+</td>
+<td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
+    @php
+        // 1. Mapear el estado a la cadena de clases de Tailwind.
+        // Esto es más limpio y evita la redundancia del @if/@elseif.
+        $estadoClass = [
+            'pagado' => 'bg-green-100 text-green-800',
+            'cancelado' => 'bg-red-100 text-red-800',
+            'pendiente' => 'bg-yellow-100 text-yellow-800',
+        ];
+        
+        // 2. Seleccionar la clase o usar un valor por defecto (amarillo)
+        $claseFinal = $estadoClass[$reserva->estado] ?? $estadoClass['pendiente'];
+    @endphp
+    
+    <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full {{ $claseFinal }} capitalize">
+        {{ ucfirst($reserva->estado) }}
+    </span>
 </td>
 </tr>
 @empty
 <tr>
-<td colspan="4" class="px-6 py-10 text-center text-gray-500">No hay ciudades registradas. ¡Crea una nueva!</td>
+<td colspan="7" class="px-6 py-10 text-center text-gray-500">No hay reservas registradas. ¡Espera nuevas ventas!</td>
 </tr>
 @endforelse
 </tbody>
@@ -145,7 +172,7 @@ Eliminar
 
 {{-- Links de Paginación --}}
 <div class="p-4 border-t border-gray-200 bg-white">
-{{ $ciudades->links() }}
+{{ $reservas->links() }}
 </div>
 </div>
 

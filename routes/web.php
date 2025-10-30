@@ -9,6 +9,7 @@ use App\Http\Controllers\ViajeAdminController;
 use App\Http\Controllers\ReservaController;
 use App\Http\Controllers\RutaAdminController; // <-- Importante
 use App\Http\Controllers\CiudadAdminController; // <-- Importante
+use App\Http\Controllers\ReservaAdminController;
 
 // Ruta principal (Homepage) AHORA SÍ TIENE NOMBRE
 Route::get('/', [HomeController::class, 'index'])->name('home'); 
@@ -64,5 +65,11 @@ Route::prefix('admin')
     Route::resource('ciudades', App\Http\Controllers\CiudadAdminController::class)->parameters([
     'ciudades' => 'ciudad',
      ]    );
+
+     // Rutas de Reporte de Reservas (NUEVA RUTA)
+    Route::get('/reservas', [ReservaAdminController::class, 'index'])->name('reservas.index');
+
+
+
 });
 // (Y ya no tiene la llave "}" extra que tenías al final)
