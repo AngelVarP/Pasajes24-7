@@ -5,31 +5,73 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\Ruta; 
 use App\Models\EmpresaDeTransporte; 
-use App\Models\Viaje; // <--- ¡ASEGÚRATE DE QUE ESTA LÍNEA ESTÉ PRESENTE!
+use App\Models\Viaje; 
 use App\Models\Asiento; 
 use Illuminate\Validation\ValidationException; 
-use Carbon\Carbon; // Para manejar fechas si es necesario en la vista o lógica
+use Carbon\Carbon; 
 
 class ViajeAdminController extends Controller
 {
     /**
-     * Muestra el listado paginado de viajes para el administrador.
-     * Corresponde a la sección "Gestionar Viajes".
+     * Muestra el listado paginado de viajes para el administrador con filtros.
+     * Criterios: Ruta, Empresa, Fecha de Salida, Servicio, Estado.
      *
+     * @param \Illuminate\Http\Request $request
      * @return \Illuminate\View\View
      */
-    public function index()
+    public function index(Request $request)
     {
-        // Obtiene todos los viajes, cargando las relaciones necesarias (Ruta, Origen, Destino, Empresa)
-        // para poder mostrar sus nombres directamente en la tabla.
-        // Los ordena por fecha y hora de salida de forma descendente y los pagina.
-        $viajes = Viaje::with(['ruta.origen', 'ruta.destino', 'empresa'])
-                        ->orderBy('fecha_salida', 'asc')
-                        ->orderBy('hora_salida', 'asc')
-                        ->paginate(15); // Muestra 15 viajes por página
+        // 1. Obtener datos auxiliares para los selectores de filtro
+        $rutas = Ruta::with(['origen', 'destino'])->orderBy('origen_id')->get();
+        $empresas = EmpresaDeTransporte::orderBy('nombre')->get();
+        
+        // Asumiendo los posibles valores de estado y servicio del modelo Viaje
+        $estadosDisponibles = ['programado', 'en_curso', 'completado', 'cancelado'];
+        $serviciosDisponibles = ['economico', 'ejecutivo', 'vip']; // Ajustar si tienes más tipos
 
-        // Pasa la colección de viajes paginados a la vista 'admin.viajes.index'
-        return view('admin.viajes.index', compact('viajes'));
+        // 2. Iniciar la consulta base (con Eager Loading)
+        $viajesQuery = Viaje::with(['ruta.origen', 'ruta.destino', 'empresa'])
+                             ->orderBy('fecha_salida', 'asc')
+                             ->orderBy('hora_salida', 'asc');
+
+        // 3. Aplicar Filtros Dinámicos
+        
+        // Filtro por Ruta (ID)
+        if ($request->filled('ruta_id')) {
+            $viajesQuery->where('ruta_id', $request->input('ruta_id'));
+        }
+        
+        // Filtro por Empresa
+        if ($request->filled('empresa_id')) {
+            $viajesQuery->where('empresa_id', $request->input('empresa_id'));
+        }
+
+        // Filtro por Fecha de Salida (Exacta)
+        if ($request->filled('fecha_salida')) {
+            $viajesQuery->whereDate('fecha_salida', $request->input('fecha_salida'));
+        }
+        
+        // Filtro por Servicio
+        if ($request->filled('tipo_servicio')) {
+            $viajesQuery->where('tipo_servicio', $request->input('tipo_servicio'));
+        }
+        
+        // Filtro por Estado
+        if ($request->filled('estado')) {
+            $viajesQuery->where('estado', $request->input('estado'));
+        }
+
+        // 4. Ejecutar la consulta y paginar, manteniendo los filtros en la URL
+        $viajes = $viajesQuery->paginate(15)->withQueryString(); 
+
+        // 5. Devolver la vista con los viajes y los datos auxiliares
+        return view('admin.viajes.index', compact(
+            'viajes', 
+            'rutas', 
+            'empresas',
+            'estadosDisponibles',
+            'serviciosDisponibles'
+        ));
     }
 
     /**
@@ -39,8 +81,12 @@ class ViajeAdminController extends Controller
     {
         $rutas = Ruta::with(['origen', 'destino'])->get(); 
         $empresas = EmpresaDeTransporte::all(); 
+        
+        // Asumiendo los posibles valores de servicio y estado para el formulario
+        $estadosDisponibles = ['programado', 'en_curso', 'completado', 'cancelado'];
+        $serviciosDisponibles = ['economico', 'ejecutivo', 'vip']; 
 
-        return view('admin.viajes.create', compact('rutas', 'empresas'));
+        return view('admin.viajes.create', compact('rutas', 'empresas', 'estadosDisponibles', 'serviciosDisponibles'));
     }
 
     
@@ -58,9 +104,8 @@ class ViajeAdminController extends Controller
 
         // ***** VALIDACIÓN DE HORA PARA HOY (CORREGIDA) *****
         $fechaSalida = Carbon::parse($validatedData['fecha_salida']);
-        $horaSalida = Carbon::parse($validatedData['hora_salida']); // Carbon parseará "HH:MM" correctamente
+        $horaSalida = Carbon::parse($validatedData['hora_salida']); 
 
-        // Comparamos fecha y hora combinadas con el momento actual
         if ($fechaSalida->isToday() && $horaSalida->isBefore(now())) {
              throw ValidationException::withMessages([
                 'hora_salida' => 'La hora de salida para hoy no puede ser en el pasado.',
@@ -92,33 +137,26 @@ class ViajeAdminController extends Controller
 
         return redirect()->route('admin.viajes.index')->with('success', 'Viaje creado exitosamente.');
     }
-    // ... (después del método 'store') ...
-
-    /**
+    
+    // ... (rest of the methods: edit, update, cancelar, actualizarEstadosManualmente)
+    
+     /**
      * Muestra el formulario pre-rellenado para editar un viaje específico.
      *
-     * @param  \App\Models\Viaje  $viaje  (Laravel inyecta el modelo Viaje basado en el ID de la ruta)
+     * @param  \App\Models\Viaje  $viaje 
      * @return \Illuminate\View\View
      */
     public function edit(Viaje $viaje)
     {
-        // Necesitamos las rutas y empresas para los <select> del formulario, igual que en create()
         $rutas = Ruta::with(['origen', 'destino'])->get(); 
         $empresas = EmpresaDeTransporte::all(); 
+        $estadosDisponibles = ['programado', 'en_curso', 'completado', 'cancelado'];
+        $serviciosDisponibles = ['economico', 'ejecutivo', 'vip']; 
 
-        // Pasa el viaje a editar, y las listas de rutas/empresas, a la vista de edición.
-        return view('admin.viajes.edit', compact('viaje', 'rutas', 'empresas'));
+        return view('admin.viajes.edit', compact('viaje', 'rutas', 'empresas', 'estadosDisponibles', 'serviciosDisponibles'));
     }
 
-    
-
-    /**
-     * Actualiza un viaje específico en la base de datos con los datos del formulario.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  \App\Models\Viaje  $viaje  (Laravel inyecta el modelo Viaje)
-     * @return \Illuminate\Http\RedirectResponse
-     */
+    // ... (update, cancelar, actualizarEstadosManualmente methods go here, unchanged from your original input)
 
     public function update(Request $request, Viaje $viaje)
     {
@@ -140,7 +178,7 @@ class ViajeAdminController extends Controller
         // Solo validamos si la fecha ES hoy. Si es una fecha futura, la hora no importa.
         if ($fechaSalida->isToday() && $horaSalida->isBefore(now())) {
              throw ValidationException::withMessages([
-                'hora_salida' => 'La hora de salida para hoy no puede ser en el pasado.',
+                 'hora_salida' => 'La hora de salida para hoy no puede ser en el pasado.',
              ]);
         }
         // *******************************************
@@ -169,8 +207,6 @@ class ViajeAdminController extends Controller
     }
 
 
-    // ... (después del método 'update') ...
-
     /**
      * Cancela un viaje específico, cambiando su estado a 'cancelado'.
      *
@@ -187,7 +223,7 @@ class ViajeAdminController extends Controller
         return redirect()->route('admin.viajes.index')->with('error', 'El viaje #'.$viaje->id.' no puede ser cancelado.');
     }
 
-/**
+    /**
      * Actualiza manualmente los estados de los viajes a 'en_curso' o 'completado'.
      * Ejecuta la misma lógica que el comando programado, pero bajo demanda.
      *
@@ -201,8 +237,8 @@ class ViajeAdminController extends Controller
 
         // 1. Marcar como "en_curso"
         $viajesParaEmpezar = Viaje::where('estado', 'programado')
-                                    ->whereRaw("CONCAT(fecha_salida, ' ', hora_salida) <= ?", [$now->toDateTimeString()])
-                                    ->get();
+                                 ->whereRaw("CONCAT(fecha_salida, ' ', hora_salida) <= ?", [$now->toDateTimeString()])
+                                 ->get();
 
         foreach ($viajesParaEmpezar as $viaje) {
             $viaje->update(['estado' => 'en_curso']);
@@ -211,17 +247,17 @@ class ViajeAdminController extends Controller
 
         // 2. Marcar como "completado"
         $viajesParaCompletar = Viaje::where('estado', 'en_curso')
-                                      ->with('ruta') // Necesitamos la duración
-                                      ->get()
-                                      ->filter(function ($viaje) use ($now) {
-                                          if (empty($viaje->ruta->duracion_estimada_minutos)) return false;
+                                     ->with('ruta') // Necesitamos la duración
+                                     ->get()
+                                     ->filter(function ($viaje) use ($now) {
+                                         if (empty($viaje->ruta->duracion_estimada_minutos)) return false;
 
-                                          // Calcula la hora de llegada estimada
-                                          $horaSalida = Carbon::parse($viaje->fecha_salida . ' ' . $viaje->hora_salida);
-                                          $horaLlegadaEstimada = $horaSalida->addMinutes($viaje->ruta->duracion_estimada_minutos);
+                                         // Calcula la hora de llegada estimada
+                                         $horaSalida = Carbon::parse($viaje->fecha_salida . ' ' . $viaje->hora_salida);
+                                         $horaLlegadaEstimada = $horaSalida->addMinutes($viaje->ruta->duracion_estimada_minutos);
 
-                                          return $now->isAfter($horaLlegadaEstimada); 
-                                      });
+                                         return $now->isAfter($horaLlegadaEstimada); 
+                                     });
 
         foreach ($viajesParaCompletar as $viaje) {
             $viaje->update(['estado' => 'completado']);
@@ -237,6 +273,4 @@ class ViajeAdminController extends Controller
         // Redirigir de vuelta a la lista de viajes con el mensaje
         return redirect()->route('admin.viajes.index')->with('success', $message);
     }
-
-
 }
