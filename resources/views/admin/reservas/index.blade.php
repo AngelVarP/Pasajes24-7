@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Reporte de Reservas - Admin</title>
 
-{{-- Estilos --}}
+{{-- Estilos (Mismos de la plantilla base) --}}
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
@@ -13,14 +13,13 @@
 @vite(['resources/css/app.css', 'resources/js/app.js'])
 <style>
 body { font-family: 'Inter', sans-serif; }
-.admin-sidebar { background-color: #111827; } 
+.admin-sidebar { background-color: #111827; }
 .admin-sidebar a { transition: all 0.2s ease-in-out; }
-.admin-sidebar a:hover, .admin-sidebar a.active { background-color: #374151; color: #f59e0b; } 
-.admin-sidebar a.active { border-left: 4px solid #f59e0b; padding-left: calc(1rem - 4px); font-weight: 600; } 
+.admin-sidebar a:hover, .admin-sidebar a.active { background-color: #374151; color: #f59e0b; }
+.admin-sidebar a.active { border-left: 4px solid #f59e0b; padding-left: calc(1rem - 4px); font-weight: 600; }
 .main-content-bg { background: linear-gradient(180deg, #f0f9ff 0%, #e0f2fe 100%); }
 .header-title { background: linear-gradient(to right, #f59e0b, #f97316); -webkit-background-clip: text; background-clip: text; color: transparent; font-weight: 800; letter-spacing: -0.025em; }
 input:focus, select:focus, button:focus-visible { outline: none; box-shadow: 0 0 0 3px rgba(245, 158, 11, 0.4); border-color: #f59e0b !important; }
-.table-cell-fixed { width: 100px; } /* Mantener estilos consistentes */
 </style>
 </head>
 <body class="bg-gray-100 text-gray-800">
@@ -48,7 +47,6 @@ input:focus, select:focus, button:focus-visible { outline: none; box-shadow: 0 0
 <svg class="w-5 h-5 mr-3 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
 <span>Gestionar Rutas</span>
 </a>
-{{-- Asumiendo la ruta 'admin.empresas.index' --}}
 <a href="#" class="flex items-center px-4 py-2.5 rounded-lg text-sm font-medium hover:bg-gray-700 hover:text-amber-500 {{ request()->routeIs('admin.empresas.index') ? 'active' : '' }}"><svg class="w-5 h-5 mr-3 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path></svg><span>Gestionar Empresas</span></a>
 <a href="{{ route('admin.ciudades.index') }}" class="flex items-center px-4 py-2.5 rounded-lg text-sm font-medium hover:bg-gray-700 hover:text-amber-500 {{ request()->routeIs('admin.ciudades.index') ? 'active' : '' }}">
 <svg class="w-5 h-5 mr-3 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.09M19.945 11H19a2 2 0 00-2 2v1a2 2 0 01-2 2 2 2 0 00-2 2v2.945M16 3.935V5.5A2.5 2.5 0 0113.5 8h-.09M12 21v-2.055A2.5 2.5 0 0114.5 16h-.09M12 3c-1.355 0-2.67.291-3.838.813a10.98 10.98 0 00-6.817 6.817C.791 11.33 0 12.645 0 14c0 1.355.791 2.67 1.345 3.838a10.98 10.98 0 006.817 6.817C9.33 24.209 10.645 25 12 25c1.355 0 2.67-.791 3.838-1.345a10.98 10.98 0 006.817-6.817C23.209 16.67 24 15.355 24 14c0-1.355-.791-2.67-1.345-3.838a10.98 10.98 0 00-6.817-6.817C14.67 2.791 13.355 2 12 2z"></path></svg><span>Gestionar Ciudades</span>
@@ -86,20 +84,39 @@ input:focus, select:focus, button:focus-visible { outline: none; box-shadow: 0 0
 <svg class="w-6 h-6 mr-3 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17v2m-1-8h2m-1 0V8m-1 4h2m-1 0h-2m-1-4h2m-1 0V8m8 0a2 2 0 012 2v10a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V17"></path></svg>
 Listado de Reservas Registradas
 </h2>
-{{-- Se quitó el botón Crear, ya que es una vista de reporte --}}
 </div>
 
-{{-- Mensajes de Éxito/Error --}}
-@if (session('success'))
-<div class="mb-4 p-4 bg-green-100 border border-green-400 text-green-700 rounded relative" role="alert">
-<span class="block sm:inline">{{ session('success') }}</span>
+{{-- **FORMULARIO DE FILTROS** (Solo por Ruta) --}}
+<div class="bg-white p-6 rounded-lg shadow-md mb-6 border border-gray-200">
+    <form action="{{ route('admin.reservas.index') }}" method="GET" class="grid grid-cols-1 md:grid-cols-3 gap-4 items-end">
+        
+        {{-- Filtro por Ruta (Ocupa dos columnas) --}}
+        <div class="col-span-2">
+            <label for="ruta_id" class="block text-sm font-medium text-gray-700 mb-1">Filtrar por Ruta:</label>
+            <select name="ruta_id" id="ruta_id" class="w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm focus:ring-amber-500 focus:border-amber-500">
+                <option value="">-- Todas las Rutas --</option>
+                @foreach ($rutas as $ruta)
+                    <option value="{{ $ruta->id }}" 
+                        {{ request('ruta_id') == $ruta->id ? 'selected' : '' }}>
+                        {{ $ruta->origen->nombre }} &rarr; {{ $ruta->destino->nombre }}
+                    </option>
+                @endforeach
+            </select>
+        </div>
+
+        {{-- Botones de Acción (Ocupa una columna) --}}
+        <div class="flex space-x-2">
+            <button type="submit" class="bg-blue-600 text-white font-bold py-2 px-4 rounded-lg shadow-md hover:bg-blue-700 transition duration-200 text-sm">
+                Filtrar
+            </button>
+            <a href="{{ route('admin.reservas.index') }}" class="bg-gray-200 text-gray-700 font-bold py-2 px-4 rounded-lg shadow-md hover:bg-gray-300 transition duration-200 text-sm">
+                Limpiar
+            </a>
+        </div>
+    </form>
 </div>
-@endif
-@if (session('error'))
-<div class="mb-4 p-4 bg-red-100 border border-red-400 text-red-700 rounded relative" role="alert">
-<span class="block sm:inline">{{ session('error') }}</span>
-</div>
-@endif
+{{-- **FIN FORMULARIO DE FILTROS** --}}
+
 
 {{-- Contenedor de la Tabla --}}
 <div class="bg-white rounded-lg shadow-xl overflow-x-auto">
@@ -145,15 +162,12 @@ Listado de Reservas Registradas
 </td>
 <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
     @php
-        // 1. Mapear el estado a la cadena de clases de Tailwind.
-        // Esto es más limpio y evita la redundancia del @if/@elseif.
+        // Mapeo de clases para evitar conflictos (solución a errores de linter)
         $estadoClass = [
             'pagado' => 'bg-green-100 text-green-800',
             'cancelado' => 'bg-red-100 text-red-800',
             'pendiente' => 'bg-yellow-100 text-yellow-800',
         ];
-        
-        // 2. Seleccionar la clase o usar un valor por defecto (amarillo)
         $claseFinal = $estadoClass[$reserva->estado] ?? $estadoClass['pendiente'];
     @endphp
     
@@ -164,7 +178,7 @@ Listado de Reservas Registradas
 </tr>
 @empty
 <tr>
-<td colspan="7" class="px-6 py-10 text-center text-gray-500">No hay reservas registradas. ¡Espera nuevas ventas!</td>
+<td colspan="7" class="px-6 py-10 text-center text-gray-500">No hay reservas registradas que coincidan con los filtros.</td>
 </tr>
 @endforelse
 </tbody>
