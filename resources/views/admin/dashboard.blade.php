@@ -140,10 +140,55 @@
                 {{-- Tarjetas de Estadísticas (Igual que antes) --}}
                 <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-6 mb-10">
                     {{-- ... (código de las 4 tarjetas de estadísticas) ... --}}
-                    <div class="stat-card bg-white p-5 rounded-lg shadow border-l-4 border-blue-500" style="animation-delay: 0.1s;"><div class="flex items-center"><div class="p-3 rounded-full bg-blue-100 text-blue-600 mr-4"><svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4"></path></svg></div><div><p class="text-sm text-gray-500 font-medium">Viajes Hoy</p><p class="text-2xl font-bold text-gray-900">12</p></div></div></div>
-                    <div class="stat-card bg-white p-5 rounded-lg shadow border-l-4 border-yellow-500" style="animation-delay: 0.2s;"><div class="flex items-center"><div class="p-3 rounded-full bg-yellow-100 text-yellow-600 mr-4"><svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg></div><div><p class="text-sm text-gray-500 font-medium">Reservas Pendientes</p><p class="text-2xl font-bold text-gray-900">3</p></div></div></div>
-                    <div class="stat-card bg-white p-5 rounded-lg shadow border-l-4 border-green-500" style="animation-delay: 0.3s;"><div class="flex items-center"><div class="p-3 rounded-full bg-green-100 text-green-600 mr-4"><svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path></svg></div><div><p class="text-sm text-gray-500 font-medium">Asientos Libres Hoy</p><p class="text-2xl font-bold text-gray-900">245</p></div></div></div>
-                    <div class="stat-card bg-white p-5 rounded-lg shadow border-l-4 border-purple-500" style="animation-delay: 0.4s;"><div class="flex items-center"><div class="p-3 rounded-full bg-purple-100 text-purple-600 mr-4"><svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path></svg></div><div><p class="text-sm text-gray-500 font-medium">Empresas Activas</p><p class="text-2xl font-bold text-gray-900">3</p></div></div></div>
+                    {{-- Viajes Hoy --}}
+                    <div class="stat-card bg-white p-5 rounded-lg shadow border-l-4 border-blue-500" style="animation-delay: 0.1s;">
+                        <div class="flex items-center">
+                            <div class="p-3 rounded-full bg-blue-100 text-blue-600 mr-4"><svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4"></path></svg></div>
+                            <div>
+                                <p class="text-sm text-gray-500 font-medium">Viajes Hoy</p>
+                                <p class="text-2xl font-bold text-gray-900">{{ $viajesHoy }}</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    {{-- Tarjeta 2: Ciudades Registradas (NUEVO) --}}
+                    <div class="stat-card bg-white p-5 rounded-lg shadow border-l-4 border-yellow-500" style="animation-delay: 0.2s;">
+                        <div class="flex items-center">
+                            <div class="p-3 rounded-full bg-yellow-100 text-yellow-600 mr-4"><svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.09M19.945 11H19a2 2 0 00-2 2v1a2 2 0 01-2 2 2 2 0 00-2 2v2.945M16 3.935V5.5A2.5 2.5 0 0113.5 8h-.09M12 21v-2.055A2.5 2.5 0 0114.5 16h-.09M12 3c-1.355 0-2.67.291-3.838.813a10.98 10.98 0 00-6.817 6.817C.791 11.33 0 12.645 0 14c0 1.355.791 2.67 1.345 3.838a10.98 10.98 0 006.817 6.817C9.33 24.209 10.645 25 12 25c1.355 0 2.67-.791 3.838-1.345a10.98 10.98 0 006.817-6.817C23.209 16.67 24 15.355 24 14c0-1.355-.791-2.67-1.345-3.838a10.98 10.98 0 00-6.817-6.817C14.67 2.791 13.355 2 12 2z"></path></svg></div>
+                            <div>
+                                <p class="text-sm text-gray-500 font-medium">Ciudades Registradas</p>
+                                <p class="text-2xl font-bold text-gray-900">{{ $ciudadesRegistradas }}</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    {{-- Tarjeta 3: Rutas Totales (NUEVO) --}}
+                    <div class="stat-card bg-white p-5 rounded-lg shadow border-l-4 border-green-500" style="animation-delay: 0.3s;">
+                        <div class="flex items-center">
+                            <div class="p-3 rounded-full bg-green-100 text-green-600 mr-4"><svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path></svg></div>
+                            <div>
+                                <p class="text-sm text-gray-500 font-medium">Rutas Totales</p>
+                                <p class="text-2xl font-bold text-gray-900">{{ $rutasTotales }}</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    {{-- Empresas Activas --}}
+                    <div class="stat-card bg-white p-5 rounded-lg shadow border-l-4 border-purple-500" style="animation-delay: 0.4s;">
+                        <div class="flex items-center">
+                            <div class="p-3 rounded-full bg-purple-100 text-purple-600 mr-4"><svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path></svg></div>
+                            <div>
+                                <p class="text-sm text-gray-500 font-medium">Empresas Activas</p>
+                                <p class="text-2xl font-bold text-gray-900">{{ $empresasActivas }}</p>
+                            </div>
+                        </div>
+                    </div>
+
+
+
+
+                    
+                    
                 </div>
 
                 {{-- Accesos Rápidos (Cards Grandes - Igual que antes) --}}

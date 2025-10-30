@@ -11,6 +11,7 @@ use App\Http\Controllers\RutaAdminController; // <-- Importante
 use App\Http\Controllers\CiudadAdminController; // <-- Importante
 use App\Http\Controllers\ReservaAdminController;
 use App\Http\Controllers\EmpresaAdminController;
+use App\Http\Controllers\DashboardController;
 
 // Ruta principal (Homepage) AHORA SÍ TIENE NOMBRE
 Route::get('/', [HomeController::class, 'index'])->name('home'); 
@@ -50,10 +51,7 @@ Route::prefix('admin')
     ->group(function () {
 
     // Dashboard
-    Route::get('/', function () { 
-        return view('admin.dashboard'); 
-    })->name('dashboard'); 
-
+    Route::get('/', [\App\Http\Controllers\DashboardAdminController::class, 'index'])->name('dashboard');
     // Rutas de Viajes CRUD
     Route::get('/viajes', [ViajeAdminController::class, 'index'])->name('viajes.index');
     Route::get('/viajes/crear', [ViajeAdminController::class, 'create'])->name('viajes.create');
