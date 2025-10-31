@@ -34,6 +34,30 @@ El sistema cuenta con un panel de administración (`/admin`) protegido por auten
 
 ---
 
+## Arquitectura del Proyecto
+
+El proyecto está construido siguiendo el patrón arquitectónico **Modelo-Vista-Controlador (MVC)**, estándar del framework Laravel.
+
+* **Modelos (Model)**: La lógica de negocio y la interacción con la base de datos se gestionan a través de los modelos de Eloquent, ubicados en `app/Models/`. Ejemplos clave incluyen:
+    * `Viaje.php`
+    * `Reserva.php`
+    * `Ciudad.php`
+    * `Ruta.php`
+    * `User.php` (utilizado para la autenticación de administradores).
+
+* **Vistas (View)**: La capa de presentación se construye con plantillas de Blade (`.blade.php`), ubicadas en `resources/views/` (ej. `welcome.blade.php`, `asientos.blade.php`, `admin/viajes/index.blade.php`). El frontend se compila con **Vite** e integra **TailwindCSS**, **Bootstrap** y **Alpine.js** para la reactividad.
+
+* **Controladores (Controller)**: Actúan como intermediarios, gestionando las solicitudes HTTP. Están ubicados en `app/Http/Controllers/`. Reciben las peticiones, interactúan con los Modelos para obtener datos y luego pasan esos datos a las Vistas para ser renderizadas. Ejemplos:
+    * `BusquedaController.php`
+    * `ReservaController.php`
+    * `ViajeAdminController.php`
+
+* **Rutas (Routing)**: El archivo `routes/web.php` define todos los endpoints de la aplicación web, mapeando las URLs a acciones específicas en los Controladores.
+
+* **Middleware**: El proyecto utiliza middleware para la protección de rutas, como se ve en `app/Http/Middleware/AdminMiddleware.php`, que se aplica a todas las rutas del panel de administración (`/admin`) para asegurar que solo los usuarios autenticados y marcados como administradores puedan acceder.
+
+---
+
 ## Tecnologías Utilizadas
 
 Este proyecto utiliza una pila de tecnologías moderna basada en PHP y JavaScript.
@@ -86,4 +110,3 @@ Para levantar el entorno de desarrollo, el script `dev` utiliza `concurrently` p
 
 ```bash
 composer run dev
-
