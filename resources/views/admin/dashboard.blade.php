@@ -15,95 +15,116 @@
 
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 
+    {{-- =============================================== --}}
+    {{-- ESTILOS PARA EL DASHBOARD "MINIMALISTA PASTEL"  --}}
+    {{-- =============================================== --}}
     <style>
-        body { font-family: 'Inter', sans-serif; -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; }
+        body { 
+            font-family: 'Inter', sans-serif; 
+            -webkit-font-smoothing: antialiased; 
+            -moz-osx-font-smoothing: grayscale;
+            background-color: #ffffff; /* Fondo principal blanco */
+        }
 
-        .admin-sidebar { background-color: #111827; }
-        .admin-sidebar a { transition: all 0.2s ease-in-out; }
-        .admin-sidebar a:hover, .admin-sidebar a.active { background-color: #374151; color: #f59e0b; }
-        .admin-sidebar a.active { border-left: 4px solid #f59e0b; padding-left: calc(1rem - 4px); font-weight: 600; } /* Más grueso el texto activo */
+        /* Sidebar: Un gris/azul sutil */
+        .admin-sidebar { 
+            background-color: #f1f5f9; /* bg-slate-100 */
+            border-right: 1px solid #e5e7eb; /* border-r border-gray-200 */
+        }
+        
+        /* Enlaces del Sidebar: Texto gris */
+        .admin-sidebar a { 
+            color: #4b5563; /* text-gray-600 */
+            transition: all 0.2s ease-in-out;
+        }
+        .admin-sidebar a:hover { 
+            background-color: #ffffff; /* bg-white */
+            color: #111827; /* text-gray-900 */
+        }
+        
+        /* Enlace Activo: Fondo blanco + acento naranja pastel */
+        .admin-sidebar a.active { 
+            color: #fb923c; /* text-orange-400 */
+            background-color: #ffffff; /* bg-white */
+            border-left: 4px solid #fb923c; /* border-l-4 border-orange-400 */
+            padding-left: calc(1rem - 4px);
+            font-weight: 600;
+        }
 
-        .admin-card { transition: all 0.3s ease-out; }
-        .admin-card:hover {
-            transform: translateY(-5px) scale(1.02);
-            box-shadow: 0 15px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
-        }
-        .main-content-bg {
-             background: linear-gradient(180deg, #f0f9ff 0%, #e0f2fe 100%);
-        }
-        .stat-card { animation: popIn 0.5s ease-out backwards; }
-        @keyframes popIn {
-            from { opacity: 0; transform: scale(0.9); }
-            to { opacity: 1; transform: scale(1); }
-        }
-        /* Estilo para el título del Header */
+        /* Título del Header limpio */
         .header-title {
-             background: linear-gradient(to right, #f59e0b, #f97316); /* Gradiente ámbar/naranja */
-             -webkit-background-clip: text;
-             background-clip: text;
-             color: transparent;
-             font-weight: 800; /* Extra bold */
-             letter-spacing: -0.025em; /* Ligeramente más junto */
+             color: #111827; /* text-gray-900 */
+             font-weight: 800;
+             letter-spacing: -0.025em;
+        }
+
+        /* Tarjeta de Acceso Rápido: Transición sutil */
+        .quick-link-card {
+            background-color: #ffffff;
+            border: 1px solid #e5e7eb; /* border-gray-200 */
+            transition: all 0.2s ease-out;
+            border-radius: 0.75rem; /* rounded-xl */
+        }
+        .quick-link-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 4px 10px rgba(0,0,0,0.03);
+            border-color: #fb923c; /* Borde naranja pastel al pasar el mouse */
         }
     </style>
 </head>
-<body class="bg-gray-100 text-gray-800">
+<body class="bg-white text-gray-900">
 
     <div class="flex min-h-screen">
-        {{-- Sidebar (Barra Lateral Izquierda) --}}
-        <aside class="admin-sidebar w-64 text-gray-300 hidden md:flex md:flex-col fixed inset-y-0 z-50 shadow-lg">
+        {{-- =============================================== --}}
+        {{-- SIDEBAR (SLATE-100)                           --}}
+        {{-- =============================================== --}}
+        <aside class="admin-sidebar w-64 text-gray-600 hidden md:flex md:flex-col fixed inset-y-0 z-50">
             {{-- Logo --}}
-            <div class="flex items-center justify-center h-20 border-b border-gray-700">
+            <div class="flex items-center justify-center h-20 border-b border-slate-200">
                  <a href="/">
-                    <img src="{{ asset('images/logo-pasajes24-7.png') }}" alt="Logo Pasajes24/7" class="h-12 w-auto filter brightness-0 invert">
+                    <img src="{{ asset('images/logo-pasajes24-7.png') }}" alt="Logo Pasajes24/7" class="h-20 w-auto">
                 </a>
             </div>
 
             {{-- Navegación del Admin --}}
-            <nav class="flex-1 px-4 py-6 space-y-2 overflow-y-auto"> {{-- Añadido overflow-y-auto --}}
-                <a href="{{ route('admin.dashboard') }}" class="active flex items-center px-4 py-2.5 rounded-lg text-sm font-medium">
+            <nav class="flex-1 px-4 py-6 space-y-2 overflow-y-auto">
+                {{-- Marcamos 'active' usando la ruta actual --}}
+                <a href="{{ route('admin.dashboard') }}" class="flex items-center px-4 py-2.5 rounded-lg text-sm font-medium {{ request()->routeIs('admin.dashboard') ? 'active' : '' }}">
                     <svg class="w-5 h-5 mr-3 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path></svg>
                     <span>Dashboard</span>
                 </a>
 
-                {{-- Separador (Opcional) --}}
                 <div class="pt-4 pb-2 px-4">
-                    <span class="text-xs font-semibold text-gray-500 uppercase tracking-wider">Gestión Principal</span>
+                    <span class="text-xs font-semibold text-gray-400 uppercase tracking-wider">Gestión</span>
                 </div>
 
-                {{-- *** ENLACES DE ACCESO RÁPIDO AHORA EN SIDEBAR *** --}}
-                <a href="{{ route('admin.viajes.create') }}" class="flex items-center px-4 py-2.5 rounded-lg text-sm font-medium hover:bg-gray-700 hover:text-amber-500">
-                     <svg class="w-5 h-5 mr-3 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v3m0 0v3m0-3h3m-3 0H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-                    <span>Crear Viaje</span>
-                </a>
-                <a href="{{ route('admin.viajes.index') }}" class="flex items-center px-4 py-2.5 rounded-lg text-sm font-medium hover:bg-gray-700 hover:text-amber-500">
+                <a href="{{ route('admin.viajes.index') }}" class="flex items-center px-4 py-2.5 rounded-lg text-sm font-medium {{ request()->routeIs('admin.viajes.*') ? 'active' : '' }}">
                     <svg class="w-5 h-5 mr-3 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 10h16M4 14h16M4 18h16"></path></svg>
-                    <span>Gestionar Viajes</span>
+                    <span>Viajes</span>
                 </a>
-                 <a href="{{ route('admin.rutas.index') }}" class="flex items-center px-4 py-2.5 rounded-lg text-sm font-medium hover:bg-gray-700 hover:text-amber-500">
+                 <a href="{{ route('admin.rutas.index') }}" class="flex items-center px-4 py-2.5 rounded-lg text-sm font-medium {{ request()->routeIs('admin.rutas.*') ? 'active' : '' }}">
                      <svg class="w-5 h-5 mr-3 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
-                    <span>Gestionar Rutas</span>
+                    <span>Rutas</span>
                 </a>
-                 <a href="{{ route('admin.empresas.index') }}" class="flex items-center px-4 py-2.5 rounded-lg text-sm font-medium hover:bg-gray-700 hover:text-amber-500">
+                 <a href="{{ route('admin.empresas.index') }}" class="flex items-center px-4 py-2.5 rounded-lg text-sm font-medium {{ request()->routeIs('admin.empresas.*') ? 'active' : '' }}">
                     <svg class="w-5 h-5 mr-3 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path></svg>
-                    <span>Gestionar Empresas</span>
+                    <span>Empresas</span>
                 </a>
-                 <a href="{{ route('admin.ciudades.index') }}" class="flex items-center px-4 py-2.5 rounded-lg text-sm font-medium hover:bg-gray-700 hover:text-amber-500">
+                 <a href="{{ route('admin.ciudades.index') }}" class="flex items-center px-4 py-2.5 rounded-lg text-sm font-medium {{ request()->routeIs('admin.ciudades.*') ? 'active' : '' }}">
                     <svg class="w-5 h-5 mr-3 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.09M19.945 11H19a2 2 0 00-2 2v1a2 2 0 01-2 2 2 2 0 00-2 2v2.945M16 3.935V5.5A2.5 2.5 0 0113.5 8h-.09M12 21v-2.055A2.5 2.5 0 0114.5 16h-.09M12 3c-1.355 0-2.67.291-3.838.813a10.98 10.98 0 00-6.817 6.817C.791 11.33 0 12.645 0 14c0 1.355.791 2.67 1.345 3.838a10.98 10.98 0 006.817 6.817C9.33 24.209 10.645 25 12 25c1.355 0 2.67-.791 3.838-1.345a10.98 10.98 0 006.817-6.817C23.209 16.67 24 15.355 24 14c0-1.355-.791-2.67-1.345-3.838a10.98 10.98 0 00-6.817-6.817C14.67 2.791 13.355 2 12 2z"></path></svg>
-                    <span>Gestionar Ciudades</span>
+                    <span>Ciudades</span>
                 </a>
-                 <a href="{{ route('admin.reservas.index') }}" class="flex items-center px-4 py-2.5 rounded-lg text-sm font-medium hover:bg-gray-700 hover:text-amber-500">
+                 <a href="{{ route('admin.reservas.index') }}" class="flex items-center px-4 py-2.5 rounded-lg text-sm font-medium {{ request()->routeIs('admin.reservas.*') ? 'active' : '' }}">
                     <svg class="w-5 h-5 mr-3 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
-                    <span>Ver Reservas</span>
+                    <span>Reservas</span>
                 </a>
-                {{-- *** FIN ENLACES ACCESO RÁPIDO *** --}}
             </nav>
 
-            {{-- Logout (Igual que antes) --}}
-            <div class="mt-auto p-4 border-t border-gray-700">
+            {{-- Logout --}}
+            <div class="mt-auto p-4 border-t border-slate-200">
                 <form method="POST" action="{{ route('admin.logout') }}">
                     @csrf
-                    <button type="submit" class="w-full flex items-center px-4 py-2.5 rounded-lg text-sm font-medium text-red-400 hover:bg-red-900 hover:text-red-300 transition duration-150">
+                    <button type="submit" class="w-full flex items-center px-4 py-2.5 rounded-lg text-sm font-medium text-gray-600 hover:bg-white hover:text-red-500 transition duration-150">
                         <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path></svg>
                         Cerrar Sesión
                     </button>
@@ -111,109 +132,126 @@
             </div>
         </aside>
 
-        {{-- Contenido Principal --}}
+        {{-- =============================================== --}}
+        {{-- CONTENIDO PRINCIPAL (BLANCO)                  --}}
+        {{-- =============================================== --}}
         <div class="flex-1 flex flex-col md:ml-64">
 
-            {{-- Header Superior --}}
-            <header class="bg-white shadow-sm h-16 flex items-center justify-between px-6 border-b border-gray-200">
+            {{-- Header Superior: Blanco, limpio --}}
+            <header class="bg-white shadow-sm h-16 flex items-center justify-between px-6 border-b border-gray-200 sticky top-0 z-40">
                  <div class="flex items-center">
                     <button class="md:hidden mr-4 text-gray-500 hover:text-gray-700">
-                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path></svg>
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 10h16M4 14h16M4 18h16"></path></svg>
                     </button>
-                    {{-- **** TÍTULO MEJORADO **** --}}
-                    <h1 class="header-title text-2xl font-extrabold tracking-tight">Dashboard</h1>
+                    <h1 class="header-title text-xl font-bold text-gray-900">Dashboard</h1>
                 </div>
                 <div class="flex items-center space-x-4">
                     <span class="text-sm text-gray-600">Hola, {{ Auth::user()->name ?? 'Admin' }}</span>
                 </div>
             </header>
 
-            {{-- Área de Contenido Principal --}}
-            <main class="flex-grow p-6 lg:p-10 main-content-bg">
+            {{-- Área de Contenido: Fondo blanco --}}
+            <main class="flex-grow p-6 lg:p-10 bg-white">
 
-                {{-- Bienvenida --}}
+                {{-- =============================================== --}}
+                {{-- BIENVENIDA (CON NOMBRE ESTILO "ETIQUETA")     --}}
+                {{-- =============================================== --}}
                 <div class="mb-8">
-                    <h2 class="text-3xl font-bold text-gray-800">¡Bienvenido de vuelta, <span class="text-amber-600">{{ Auth::user()->name ?? 'Admin' }}</span>! 👋</h2>
-                    <p class="text-gray-600 mt-1">Aquí tienes un resumen rápido de la actividad.</p>
+                    <h2 class="text-3xl font-bold text-gray-900">
+                        ¡Bienvenido, 
+                        <span class="font-semibold bg-slate-100 px-3 py-1 rounded-lg text-gray-800">{{ Auth::user()->name ?? 'Admin' }}</span>! 👋
+                    </h2>
+                    <p class="text-gray-500 mt-2">Aquí tienes tu resumen rápido.</p>
                 </div>
 
-                {{-- Tarjetas de Estadísticas (Igual que antes) --}}
+                {{-- =============================================== --}}
+                {{-- TARJETAS DE ESTADÍSTICAS (Minimalistas)       --}}
+                {{-- =============================================== --}}
                 <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-6 mb-10">
-                    {{-- ... (código de las 4 tarjetas de estadísticas) ... --}}
+                    
                     {{-- Viajes Hoy --}}
-                    <div class="stat-card bg-white p-5 rounded-lg shadow border-l-4 border-blue-500" style="animation-delay: 0.1s;">
-                        <div class="flex items-center">
-                            <div class="p-3 rounded-full bg-blue-100 text-blue-600 mr-4"><svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4"></path></svg></div>
-                            <div>
-                                <p class="text-sm text-gray-500 font-medium">Viajes Hoy</p>
-                                <p class="text-2xl font-bold text-gray-900">{{ $viajesHoy }}</p>
-                            </div>
-                        </div>
+                    <div class="bg-white p-5 rounded-lg shadow-sm border border-gray-200 border-t-4 border-t-orange-400">
+                        <p class="text-sm text-gray-500 font-medium uppercase tracking-wider">Viajes Hoy</p>
+                        <p class="text-3xl font-bold text-gray-900 mt-1">{{ $viajesHoy }}</p>
                     </div>
 
-                    {{-- Tarjeta 2: Ciudades Registradas (NUEVO) --}}
-                    <div class="stat-card bg-white p-5 rounded-lg shadow border-l-4 border-yellow-500" style="animation-delay: 0.2s;">
-                        <div class="flex items-center">
-                            <div class="p-3 rounded-full bg-yellow-100 text-yellow-600 mr-4"><svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.09M19.945 11H19a2 2 0 00-2 2v1a2 2 0 01-2 2 2 2 0 00-2 2v2.945M16 3.935V5.5A2.5 2.5 0 0113.5 8h-.09M12 21v-2.055A2.5 2.5 0 0114.5 16h-.09M12 3c-1.355 0-2.67.291-3.838.813a10.98 10.98 0 00-6.817 6.817C.791 11.33 0 12.645 0 14c0 1.355.791 2.67 1.345 3.838a10.98 10.98 0 006.817 6.817C9.33 24.209 10.645 25 12 25c1.355 0 2.67-.791 3.838-1.345a10.98 10.98 0 006.817-6.817C23.209 16.67 24 15.355 24 14c0-1.355-.791-2.67-1.345-3.838a10.98 10.98 0 00-6.817-6.817C14.67 2.791 13.355 2 12 2z"></path></svg></div>
-                            <div>
-                                <p class="text-sm text-gray-500 font-medium">Ciudades Registradas</p>
-                                <p class="text-2xl font-bold text-gray-900">{{ $ciudadesRegistradas }}</p>
-                            </div>
-                        </div>
+                    {{-- Ciudades Registradas --}}
+                    <div class="bg-white p-5 rounded-lg shadow-sm border border-gray-200 border-t-4 border-t-blue-500">
+                        <p class="text-sm text-gray-500 font-medium uppercase tracking-wider">Ciudades</p>
+                        <p class="text-3xl font-bold text-gray-900 mt-1">{{ $ciudadesRegistradas }}</p>
                     </div>
 
-                    {{-- Tarjeta 3: Rutas Totales (NUEVO) --}}
-                    <div class="stat-card bg-white p-5 rounded-lg shadow border-l-4 border-green-500" style="animation-delay: 0.3s;">
-                        <div class="flex items-center">
-                            <div class="p-3 rounded-full bg-green-100 text-green-600 mr-4"><svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path></svg></div>
-                            <div>
-                                <p class="text-sm text-gray-500 font-medium">Rutas Totales</p>
-                                <p class="text-2xl font-bold text-gray-900">{{ $rutasTotales }}</p>
-                            </div>
-                        </div>
+                    {{-- Rutas Totales --}}
+                    <div class="bg-white p-5 rounded-lg shadow-sm border border-gray-200 border-t-4 border-t-green-500">
+                        <p class="text-sm text-gray-500 font-medium uppercase tracking-wider">Rutas Totales</p>
+                        <p class="text-3xl font-bold text-gray-900 mt-1">{{ $rutasTotales }}</p>
                     </div>
 
                     {{-- Empresas Activas --}}
-                    <div class="stat-card bg-white p-5 rounded-lg shadow border-l-4 border-purple-500" style="animation-delay: 0.4s;">
-                        <div class="flex items-center">
-                            <div class="p-3 rounded-full bg-purple-100 text-purple-600 mr-4"><svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path></svg></div>
-                            <div>
-                                <p class="text-sm text-gray-500 font-medium">Empresas Activas</p>
-                                <p class="text-2xl font-bold text-gray-900">{{ $empresasActivas }}</p>
-                            </div>
-                        </div>
+                    <div class="bg-white p-5 rounded-lg shadow-sm border border-gray-200 border-t-4 border-t-purple-500">
+                        <p class="text-sm text-gray-500 font-medium uppercase tracking-wider">Empresas Activas</p>
+                        <p class="text-3xl font-bold text-gray-900 mt-1">{{ $empresasActivas }}</p>
                     </div>
-
-
-
-
-                    
-                    
                 </div>
 
-                {{-- Accesos Rápidos (Cards Grandes - Igual que antes) --}}
-                <h3 class="text-xl font-semibold text-gray-700 mb-6">Accesos Rápidos</h3>
-                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
-                    {{-- ... (código de las 6 cards de acceso rápido) ... --}}
-                    <a href="{{ route('admin.viajes.create') }}" class="admin-card flex flex-col p-6 bg-white rounded-xl shadow-lg border-b-4 border-amber-500 text-center items-center"><div class="p-4 rounded-full bg-amber-100 text-amber-600 mb-4 inline-block"><svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v3m0 0v3m0-3h3m-3 0H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg></div><h2 class="text-lg font-semibold text-gray-800 mb-1">Crear Viaje</h2><p class="text-gray-500 text-xs">Añadir nuevo horario.</p></a>
-                    {{-- Card Gestionar Viajes --}}
-                    <a href="{{ route('admin.viajes.index') }}" 
-                    class="admin-card flex flex-col p-6 bg-white rounded-xl shadow-lg border-b-4 border-blue-500 text-center items-center">
+                {{-- =============================================== --}}
+                {{-- ACCESOS RÁPIDOS (CON ICONOS DE COLOR)         --}}
+                {{-- =============================================== --}}
+                <h3 class="text-xl font-semibold text-gray-800 mb-6">Accesos Rápidos</h3>
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                    
+                    <a href="{{ route('admin.viajes.create') }}" class="quick-link-card p-6 text-center items-center flex flex-col">
+                        <div class="p-4 rounded-full bg-orange-100 text-orange-500 mb-4 inline-block">
+                            <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v3m0 0v3m0-3h3m-3 0H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                        </div>
+                        <h2 class="text-lg font-semibold text-gray-800 mb-1">Crear Viaje</h2>
+                        <p class="text-gray-500 text-sm">Añadir nuevo horario.</p>
+                    </a>
+                    
+                    <a href="{{ route('admin.viajes.index') }}" class="quick-link-card p-6 text-center items-center flex flex-col">
                         <div class="p-4 rounded-full bg-blue-100 text-blue-600 mb-4 inline-block">
                             <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 10h16M4 14h16M4 18h16"></path></svg>
                         </div>
                         <h2 class="text-lg font-semibold text-gray-800 mb-1">Gestionar Viajes</h2>
-                        <p class="text-gray-500 text-xs">Ver, editar o cancelar viajes.</p>
+                        <p class="text-gray-500 text-sm">Ver, editar o cancelar.</p>
                     </a>
-                    <a href="{{ route('admin.rutas.index') }}" class="admin-card flex flex-col p-6 bg-white rounded-xl shadow-lg border-b-4 border-green-500 text-center items-center"><div class="p-4 rounded-full bg-green-100 text-green-600 mb-4 inline-block"><svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path></svg></div><h2 class="text-lg font-semibold text-gray-800 mb-1">Gestionar Rutas</h2><p class="text-gray-500 text-xs">Editar orígenes/destinos.</p></a>
-                    <a href="{{ route('admin.empresas.index') }}" class="admin-card flex flex-col p-6 bg-white rounded-xl shadow-lg border-b-4 border-purple-500 text-center items-center"><div class="p-4 rounded-full bg-purple-100 text-purple-600 mb-4 inline-block"><svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path></svg></div><h2 class="text-lg font-semibold text-gray-800 mb-1">Gestionar Empresas</h2><p class="text-gray-500 text-xs">Administrar transportistas.</p></a>
-                    <a href="{{ route('admin.ciudades.index') }}" class="admin-card flex flex-col p-6 bg-white rounded-xl shadow-lg border-b-4 border-pink-500 text-center items-center"><div class="p-4 rounded-full bg-pink-100 text-pink-600 mb-4 inline-block"><svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.09M19.945 11H19a2 2 0 00-2 2v1a2 2 0 01-2 2 2 2 0 00-2 2v2.945M16 3.935V5.5A2.5 2.5 0 0113.5 8h-.09M12 21v-2.055A2.5 2.5 0 0114.5 16h-.09M12 3c-1.355 0-2.67.291-3.838.813a10.98 10.98 0 00-6.817 6.817C.791 11.33 0 12.645 0 14c0 1.355.791 2.67 1.345 3.838a10.98 10.98 0 006.817 6.817C9.33 24.209 10.645 25 12 25c1.355 0 2.67-.791 3.838-1.345a10.98 10.98 0 006.817-6.817C23.209 16.67 24 15.355 24 14c0-1.355-.791-2.67-1.345-3.838a10.98 10.98 0 00-6.817-6.817C14.67 2.791 13.355 2 12 2z"></path></svg></div><h2 class="text-lg font-semibold text-gray-800 mb-1">Gestionar Ciudades</h2><p class="text-gray-500 text-xs">Editar orígenes/destinos.</p></a>
-                    <a href="{{ route('admin.reservas.index') }}" class="admin-card flex flex-col p-6 bg-white rounded-xl shadow-lg border-b-4 border-teal-500 text-center items-center"><div class="p-4 rounded-full bg-teal-100 text-teal-600 mb-4 inline-block"><svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg></div><h2 class="text-lg font-semibold text-gray-800 mb-1">Ver Reservas</h2><p class="text-gray-500 text-xs">Consultar y gestionar.</p></a>
+
+                    <a href="{{ route('admin.rutas.index') }}" class="quick-link-card p-6 text-center items-center flex flex-col">
+                        <div class="p-4 rounded-full bg-green-100 text-green-600 mb-4 inline-block">
+                            <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
+                        </div>
+                        <h2 class="text-lg font-semibold text-gray-800 mb-1">Gestionar Rutas</h2>
+                        <p class="text-gray-500 text-sm">Editar orígenes/destinos.</p>
+                    </a>
+
+                    <a href="{{ route('admin.empresas.index') }}" class="quick-link-card p-6 text-center items-center flex flex-col">
+                        <div class="p-4 rounded-full bg-purple-100 text-purple-600 mb-4 inline-block">
+                            <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path></svg>
+                        </div>
+                        <h2 class="text-lg font-semibold text-gray-800 mb-1">Gestionar Empresas</h2>
+                        <p class="text-gray-500 text-sm">Administrar transportistas.</p>
+                    </a>
+
+                    <a href="{{ route('admin.ciudades.index') }}" class="quick-link-card p-6 text-center items-center flex flex-col">
+                        <div class="p-4 rounded-full bg-pink-100 text-pink-600 mb-4 inline-block">
+                            <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.09M19.945 11H19a2 2 0 00-2 2v1a2 2 0 01-2 2 2 2 0 00-2 2v2.945M16 3.935V5.5A2.5 2.5 0 0113.5 8h-.09M12 21v-2.055A2.5 2.5 0 0114.5 16h-.09M12 3c-1.355 0-2.67.291-3.838.813a10.98 10.98 0 00-6.817 6.817C.791 11.33 0 12.645 0 14c0 1.355.791 2.67 1.345 3.838a10.98 10.98 0 006.817 6.817C9.33 24.209 10.645 25 12 25c1.355 0 2.67-.791 3.838-1.345a10.98 10.98 0 006.817-6.817C23.209 16.67 24 15.355 24 14c0-1.355-.791-2.67-1.345-3.838a10.98 10.98 0 00-6.817-6.817C14.67 2.791 13.355 2 12 2z"></path></svg>
+                        </div>
+                        <h2 class="text-lg font-semibold text-gray-800 mb-1">Gestionar Ciudades</h2>
+                        <p class="text-gray-500 text-sm">Editar orígenes/destinos.</p>
+                    </a>
+
+                    <a href="{{ route('admin.reservas.index') }}" class="quick-link-card p-6 text-center items-center flex flex-col">
+                        <div class="p-4 rounded-full bg-teal-100 text-teal-600 mb-4 inline-block">
+                            <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
+                        </div>
+                        <h2 class="text-lg font-semibold text-gray-800 mb-1">Ver Reservas</h2>
+                        <p class="text-gray-500 text-sm">Consultar y gestionar.</p>
+                    </a>
                 </div>
 
             </main>
 
-            {{-- Footer (Igual que antes) --}}
+            {{-- Footer: Limpio --}}
             <footer class="bg-white text-gray-500 py-4 px-6 mt-auto border-t border-gray-200 text-sm text-center md:text-left">
                &copy; {{ date('Y') }} Pasajes24/7 - Panel de Administración.
             </footer>
