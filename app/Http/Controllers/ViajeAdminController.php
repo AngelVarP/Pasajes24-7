@@ -9,6 +9,8 @@ use App\Models\Viaje;
 use App\Models\Asiento; 
 use Illuminate\Validation\ValidationException; 
 use Carbon\Carbon; 
+use Illuminate\Support\Facades\Auth;
+use App\Models\ViajeEvento;
 
 class ViajeAdminController extends Controller
 {
@@ -26,7 +28,7 @@ class ViajeAdminController extends Controller
         $empresas = EmpresaDeTransporte::orderBy('nombre')->get();
         
         // Asumiendo los posibles valores de estado y servicio del modelo Viaje
-        $estadosDisponibles = ['programado', 'en_curso', 'completado', 'cancelado'];
+        $estadosDisponibles = ['programado', 'en_curso', 'en_retraso', 'completado', 'cancelado'];
         $serviciosDisponibles = ['economico', 'ejecutivo', 'vip']; // Ajustar si tienes más tipos
 
         // 2. Iniciar la consulta base (con Eager Loading)
@@ -83,7 +85,7 @@ class ViajeAdminController extends Controller
         $empresas = EmpresaDeTransporte::all(); 
         
         // Asumiendo los posibles valores de servicio y estado para el formulario
-        $estadosDisponibles = ['programado', 'en_curso', 'completado', 'cancelado'];
+        $estadosDisponibles = ['programado', 'en_curso', 'en_retraso', 'completado', 'cancelado'];
         $serviciosDisponibles = ['economico', 'ejecutivo', 'vip']; 
 
         return view('admin.viajes.create', compact('rutas', 'empresas', 'estadosDisponibles', 'serviciosDisponibles'));
@@ -125,6 +127,14 @@ class ViajeAdminController extends Controller
             'estado' => 'programado',
         ]);
 
+        $this->logEvento(
+            $viaje,
+            null,
+            $viaje->estado,
+            'creacion',
+            ['mensaje' => 'Viaje creado desde el panel admin']
+        );
+
         for ($i = 1; $i <= $viaje->asientos_totales; $i++) {
             Asiento::create([
                 'viaje_id' => $viaje->id,
@@ -150,7 +160,7 @@ class ViajeAdminController extends Controller
     {
         $rutas = Ruta::with(['origen', 'destino'])->get(); 
         $empresas = EmpresaDeTransporte::all(); 
-        $estadosDisponibles = ['programado', 'en_curso', 'completado', 'cancelado'];
+        $estadosDisponibles = ['programado', 'en_curso', 'en_retraso', 'completado', 'cancelado'];
         $serviciosDisponibles = ['economico', 'ejecutivo', 'vip']; 
 
         return view('admin.viajes.edit', compact('viaje', 'rutas', 'empresas', 'estadosDisponibles', 'serviciosDisponibles'));
@@ -217,60 +227,183 @@ class ViajeAdminController extends Controller
     public function cancelar(Viaje $viaje)
     {
         if ($viaje->estado === 'programado' || $viaje->estado === 'en_curso') {
+            $estadoAnterior = $viaje->estado;
             $viaje->update(['estado' => 'cancelado']);
+            $this->logEvento(
+                $viaje,
+                $estadoAnterior,
+                'cancelado',
+                'estado',
+                ['motivo' => 'cancelacion_admin']
+            );
             return redirect()->route('admin.viajes.index')->with('success', 'Viaje #'.$viaje->id.' ha sido cancelado.');
         }
         return redirect()->route('admin.viajes.index')->with('error', 'El viaje #'.$viaje->id.' no puede ser cancelado.');
     }
 
     /**
-     * Actualiza manualmente los estados de los viajes a 'en_curso' o 'completado'.
-     * Ejecuta la misma lógica que el comando programado, pero bajo demanda.
+     * Actualiza estados a 'en_curso' y marca retrasos automáticamente.
      *
      * @return \Illuminate\Http\RedirectResponse
      */
     public function actualizarEstadosManualmente()
     {
         $now = Carbon::now();
+        $graceMinutes = (int) config('viajes.arrival_grace_minutes', 30);
         $updatedEnCurso = 0;
-        $updatedCompletado = 0;
+        $updatedRetraso = 0;
 
-        // 1. Marcar como "en_curso"
+        // 1. Marcar como "en_curso" los viajes cuya hora de salida ya pasó.
         $viajesParaEmpezar = Viaje::where('estado', 'programado')
-                                 ->whereRaw("CONCAT(fecha_salida, ' ', hora_salida) <= ?", [$now->toDateTimeString()])
-                                 ->get();
+            ->whereRaw("CONCAT(fecha_salida, ' ', hora_salida) <= ?", [$now->toDateTimeString()])
+            ->get();
 
         foreach ($viajesParaEmpezar as $viaje) {
+            $estadoAnterior = $viaje->estado;
             $viaje->update(['estado' => 'en_curso']);
             $updatedEnCurso++;
+            $this->logEvento(
+                $viaje,
+                $estadoAnterior,
+                'en_curso',
+                'estado',
+                ['origen' => 'actualizacion_manual']
+            );
         }
 
-        // 2. Marcar como "completado"
-        $viajesParaCompletar = Viaje::where('estado', 'en_curso')
-                                     ->with('ruta') // Necesitamos la duración
-                                     ->get()
-                                     ->filter(function ($viaje) use ($now) {
-                                         if (empty($viaje->ruta->duracion_estimada_minutos)) return false;
+        // 2. Detectar viajes que deberían haber llegado (con margen) y marcarlos en retraso.
+        $viajesConPosibleRetraso = Viaje::whereIn('estado', ['en_curso', 'en_retraso'])
+            ->with('ruta')
+            ->get()
+            ->filter(function ($viaje) {
+                return filled($viaje->ruta?->duracion_estimada_minutos);
+            });
 
-                                         // Calcula la hora de llegada estimada
-                                         $horaSalida = Carbon::parse($viaje->fecha_salida . ' ' . $viaje->hora_salida);
-                                         $horaLlegadaEstimada = $horaSalida->addMinutes($viaje->ruta->duracion_estimada_minutos);
+        foreach ($viajesConPosibleRetraso as $viaje) {
+            $horaSalida = Carbon::parse($viaje->fecha_salida . ' ' . $viaje->hora_salida);
+            $horaEstimadaConMargen = $horaSalida->copy()
+                ->addMinutes($viaje->ruta->duracion_estimada_minutos + $graceMinutes);
 
-                                         return $now->isAfter($horaLlegadaEstimada); 
-                                     });
-
-        foreach ($viajesParaCompletar as $viaje) {
-            $viaje->update(['estado' => 'completado']);
-            $updatedCompletado++;
+            if ($now->greaterThan($horaEstimadaConMargen) && $viaje->estado !== 'en_retraso') {
+                $estadoAnterior = $viaje->estado;
+                $viaje->update(['estado' => 'en_retraso']);
+                $updatedRetraso++;
+                $this->logEvento(
+                    $viaje,
+                    $estadoAnterior,
+                    'en_retraso',
+                    'estado',
+                    [
+                        'origen' => 'detector_retraso',
+                        'hora_estimacion' => $horaEstimadaConMargen->toDateTimeString(),
+                        'grace_minutes' => $graceMinutes,
+                    ]
+                );
+            }
         }
 
-        // Construir mensaje de éxito
-        $message = "Actualización de estados completada. ";
-        if ($updatedEnCurso > 0) $message .= "$updatedEnCurso viajes marcados como 'en curso'. ";
-        if ($updatedCompletado > 0) $message .= "$updatedCompletado viajes marcados como 'completado'. ";
-        if ($updatedEnCurso == 0 && $updatedCompletado == 0) $message .= "No hubo cambios.";
+        $message = 'Actualización de estados completada.';
+        if ($updatedEnCurso > 0) {
+            $message .= " {$updatedEnCurso} viajes marcados como 'en curso'.";
+        }
+        if ($updatedRetraso > 0) {
+            $message .= " {$updatedRetraso} viajes marcados como 'en retraso'.";
+        }
+        if ($updatedEnCurso === 0 && $updatedRetraso === 0) {
+            $message .= ' No hubo cambios.';
+        }
 
-        // Redirigir de vuelta a la lista de viajes con el mensaje
         return redirect()->route('admin.viajes.index')->with('success', $message);
+    }
+
+    /**
+     * Marca manualmente un viaje como completado registrando su hora de llegada real.
+     */
+    public function marcarComoCompletado(Request $request, Viaje $viaje)
+    {
+        if (! in_array($viaje->estado, ['en_curso', 'en_retraso'], true)) {
+            return back()->with('error', 'Solo puedes completar viajes que estén en curso o en retraso.');
+        }
+
+        $request->validate([
+            'hora_llegada_real' => ['nullable', 'date'],
+        ]);
+
+        $horaLlegada = $request->filled('hora_llegada_real')
+            ? Carbon::parse($request->input('hora_llegada_real'))
+            : Carbon::now();
+
+        $horaSalida = Carbon::parse($viaje->fecha_salida . ' ' . $viaje->hora_salida);
+
+        if ($horaLlegada->lessThan($horaSalida)) {
+            return back()
+                ->withErrors(['hora_llegada_real' => 'La llegada no puede ser anterior a la hora de salida.'])
+                ->withInput();
+        }
+
+        $estadoAnterior = $viaje->estado;
+        $minutosRetraso = null;
+        if ($viaje->ruta && $viaje->ruta->duracion_estimada_minutos !== null) {
+            $horaEstimada = $horaSalida->copy()->addMinutes($viaje->ruta->duracion_estimada_minutos);
+
+            if ($horaLlegada->lessThan($horaEstimada)) {
+                return back()
+                    ->withErrors([
+                        'hora_llegada_real' => 'La llegada no puede ser anterior a la hora estimada (' . $horaEstimada->format('d/m H:i') . ').',
+                    ])
+                    ->withInput();
+            }
+
+            $minutosRetraso = max(0, $horaEstimada->diffInMinutes($horaLlegada, false));
+        }
+
+        $viaje->update([
+            'estado' => 'completado',
+            'hora_llegada_real' => $horaLlegada,
+            'minutos_retraso' => $minutosRetraso,
+        ]);
+
+        $this->logEvento(
+            $viaje,
+            $estadoAnterior,
+            'completado',
+            'llegada',
+            [
+                'hora_llegada_real' => $horaLlegada->toDateTimeString(),
+                'minutos_retraso' => $minutosRetraso,
+            ]
+        );
+
+        return back()->with('success', 'Viaje #'.$viaje->id.' marcado como completado.');
+    }
+
+    public function show(Viaje $viaje)
+    {
+        $viaje->load([
+            'ruta.origen',
+            'ruta.destino',
+            'empresa',
+            'eventos' => fn ($query) => $query->orderBy('created_at'),
+        ]);
+
+        $eventos = $viaje->eventos;
+
+        return view('admin.viajes.show', [
+            'viaje' => $viaje,
+            'eventos' => $eventos,
+        ]);
+    }
+
+    private function logEvento(Viaje $viaje, ?string $estadoAnterior, ?string $estadoNuevo, string $tipoEvento, array $detalles = []): void
+    {
+        ViajeEvento::create([
+            'viaje_id' => $viaje->id,
+            'estado_anterior' => $estadoAnterior,
+            'estado_nuevo' => $estadoNuevo,
+            'tipo_evento' => $tipoEvento,
+            'detalles' => $detalles,
+            'actor_id' => Auth::id(),
+            'actor_tipo' => Auth::check() ? 'admin' : 'sistema',
+        ]);
     }
 }

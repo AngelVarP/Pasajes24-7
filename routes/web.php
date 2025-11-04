@@ -12,6 +12,7 @@ use App\Http\Controllers\CiudadAdminController; // <-- Importante
 use App\Http\Controllers\ReservaAdminController;
 use App\Http\Controllers\EmpresaAdminController;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\PuntualidadReportController;
 
 // Ruta principal (Homepage) AHORA SÍ TIENE NOMBRE
 Route::get('/', [HomeController::class, 'index'])->name('home'); 
@@ -57,9 +58,11 @@ Route::prefix('admin')
     Route::get('/viajes/crear', [ViajeAdminController::class, 'create'])->name('viajes.create');
     Route::post('/viajes', [ViajeAdminController::class, 'store'])->name('viajes.store');
     Route::get('/viajes/{viaje}/editar', [ViajeAdminController::class, 'edit'])->name('viajes.edit');
+    Route::get('/viajes/{viaje}', [ViajeAdminController::class, 'show'])->name('viajes.show');
     Route::put('/viajes/{viaje}', [ViajeAdminController::class, 'update'])->name('viajes.update');
     Route::post('/viajes/{viaje}/cancelar', [ViajeAdminController::class, 'cancelar'])->name('viajes.cancelar');
     Route::post('/viajes/actualizar-estados', [App\Http\Controllers\ViajeAdminController::class, 'actualizarEstadosManualmente'])->name('viajes.actualizarEstados');
+    Route::post('/viajes/{viaje}/finalizar', [App\Http\Controllers\ViajeAdminController::class, 'marcarComoCompletado'])->name('viajes.finalizar');
     Route::resource('rutas', App\Http\Controllers\RutaAdminController::class)->except(['show']); // Asegúrate de incluir el namespace completo si es necesario
     Route::resource('ciudades', App\Http\Controllers\CiudadAdminController::class)->parameters([
     'ciudades' => 'ciudad',
@@ -69,6 +72,7 @@ Route::prefix('admin')
     Route::get('/reservas', [ReservaAdminController::class, 'index'])->name('reservas.index');
 
     Route::resource('empresas', EmpresaAdminController::class)->except(['show']);
+    Route::get('/reportes/puntualidad', [PuntualidadReportController::class, 'index'])->name('reportes.puntualidad');
 
 
 
